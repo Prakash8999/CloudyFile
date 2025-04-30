@@ -1,8 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Cloud, Shield, Zap } from 'lucide-react';
+import { useState } from 'react';
+import AuthModal from '../auth/AuthModal';
 
 export default function Hero() {
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+    const [authModalTab, setAuthModalTab] = useState<'login' | 'signup'>('login');
+  const handleAuthClick = (tab: 'login' | 'signup') => {
+    setAuthModalTab(tab);
+    setAuthModalOpen(true);
+  };
   return (
     <div className="relative overflow-hidden pt-16 md:pt-20 pb-16">
       <div className="absolute inset-0 z-0">
@@ -35,11 +43,10 @@ export default function Hero() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link to="/dashboard">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+              
+                <Button size="lg" variant="outline" className="w-full sm:w-auto" onClick={() => handleAuthClick('login')}>
                   Log In
                 </Button>
-              </Link>
             </div>
             
             <div className="flex flex-wrap gap-4 md:gap-8">
@@ -99,6 +106,11 @@ export default function Hero() {
           </div>
         </div>
       </div>
+      <AuthModal 
+              open={authModalOpen} 
+              onOpenChange={setAuthModalOpen}
+              defaultTab={authModalTab}
+            />
     </div>
   );
 }

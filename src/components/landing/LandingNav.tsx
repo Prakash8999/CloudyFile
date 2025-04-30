@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { useTheme } from '@/components/theme/theme-provider';
+import AuthModal from '@/components/auth/AuthModal';
 
 export default function LandingNav() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'signup'>('login');
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
@@ -17,6 +20,12 @@ export default function LandingNav() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleAuthClick = (tab: 'login' | 'signup') => {
+    setAuthModalTab(tab);
+    setAuthModalOpen(true);
+    setMobileMenuOpen(false);
+  };
 
   return (
     <header 
@@ -62,16 +71,12 @@ export default function LandingNav() {
           </nav>
           
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/dashboard">
-              <Button variant="outline" size="sm">
-                Log In
-              </Button>
-            </Link>
-            <Link to="/dashboard">
-              <Button size="sm">
-                Get Started
-              </Button>
-            </Link>
+            <Button variant="outline" size="sm" onClick={() => handleAuthClick('login')}>
+              Log In
+            </Button>
+            <Button size="sm" onClick={() => handleAuthClick('signup')}>
+              Sign Up
+            </Button>
           </div>
           
           <Button
@@ -118,24 +123,19 @@ export default function LandingNav() {
               About
             </Link>
             <div className="pt-2 space-y-2">
-              <Link 
-                to="/dashboard" 
-                className="block w-full"
-                onClick={() => setMobileMenuOpen(false)}
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => handleAuthClick('login')}
               >
-                <Button variant="outline" className="w-full">
-                  Log In
-                </Button>
-              </Link>
-              <Link 
-                to="/dashboard" 
-                className="block w-full"
-                onClick={() => setMobileMenuOpen(false)}
+                Log In
+              </Button>
+              <Button 
+                className="w-full"
+                onClick={() => handleAuthClick('signup')}
               >
-                <Button className="w-full">
-                  Get Started
-                </Button>
-              </Link>
+                Sign Up
+              </Button>
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -151,6 +151,12 @@ export default function LandingNav() {
           </div>
         </div>
       )}
+
+      <AuthModal 
+        open={authModalOpen} 
+        onOpenChange={setAuthModalOpen}
+        defaultTab={authModalTab}
+      />
     </header>
   );
 }
