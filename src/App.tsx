@@ -13,12 +13,15 @@ import Landing from '@/pages/landing';
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import AuthProvider from './hooks/AuthProvider';
 
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
 
     <ThemeProvider defaultTheme="light" storageKey="cloudyfile-theme">
+      <AuthProvider>
+
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -32,6 +35,7 @@ function App() {
         <Route path="/dashboard/settings" element={<Settings />} />
         <Route path="/dashboard/profile" element={<Profile />} />
       </Routes>
+      </AuthProvider>
       <Toaster />
     </ThemeProvider>
     </GoogleOAuthProvider>
