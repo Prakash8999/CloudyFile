@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { useTheme } from '@/components/theme/theme-provider';
 import AuthModal from '@/components/auth/AuthModal';
+import { useAuth } from '@/hooks/AuthProvider';
 
 export default function LandingNav() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,7 +17,7 @@ export default function LandingNav() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -27,13 +28,15 @@ export default function LandingNav() {
     setMobileMenuOpen(false);
   };
 
+  const navigate = useNavigate()
+
+  const { user } = useAuth()
   return (
-    <header 
-      className={`sticky top-0 z-50 transition-all duration-200 ${
-        isScrolled 
-          ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm' 
+    <header
+      className={`sticky top-0 z-50 transition-all duration-200 ${isScrolled
+          ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between py-4">
@@ -47,7 +50,7 @@ export default function LandingNav() {
             </div>
             <span className="text-xl font-bold">Cloudyfile</span>
           </Link>
-          
+
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/" className="text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               Home
@@ -61,15 +64,20 @@ export default function LandingNav() {
             <Link to="/#about" className="text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               About
             </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
             </Button>
           </nav>
-          
+
+
+
+          {
+            user ? <Button onClick={() => navigate('/dashboard')}> Dashboard</Button> : <div>
+
           <div className="hidden md:flex items-center gap-3">
             <Button variant="outline" size="sm" onClick={() => handleAuthClick('login')}>
               Log In
@@ -78,7 +86,11 @@ export default function LandingNav() {
               Sign Up
             </Button>
           </div>
-          
+            </div>
+
+
+          }
+
           <Button
             variant="ghost"
             size="icon"
@@ -90,54 +102,54 @@ export default function LandingNav() {
           </Button>
         </div>
       </div>
-      
+
       {mobileMenuOpen && (
         <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
           <div className="container mx-auto px-4 py-4 space-y-3">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="block py-2 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400"
               onClick={() => setMobileMenuOpen(false)}
             >
               Home
             </Link>
-            <Link 
-              to="/#features" 
+            <Link
+              to="/#features"
               className="block py-2 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400"
               onClick={() => setMobileMenuOpen(false)}
             >
               Features
             </Link>
-            <Link 
-              to="/#pricing" 
+            <Link
+              to="/#pricing"
               className="block py-2 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400"
               onClick={() => setMobileMenuOpen(false)}
             >
               Pricing
             </Link>
-            <Link 
-              to="/#about" 
+            <Link
+              to="/#about"
               className="block py-2 text-sm font-medium hover:text-blue-600 dark:hover:text-blue-400"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </Link>
             <div className="pt-2 space-y-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
                 onClick={() => handleAuthClick('login')}
               >
                 Log In
               </Button>
-              <Button 
+              <Button
                 className="w-full"
                 onClick={() => handleAuthClick('signup')}
               >
                 Sign Up
               </Button>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 className="w-full justify-start"
                 onClick={() => {
@@ -152,8 +164,8 @@ export default function LandingNav() {
         </div>
       )}
 
-      <AuthModal 
-        open={authModalOpen} 
+      <AuthModal
+        open={authModalOpen}
         onOpenChange={setAuthModalOpen}
         defaultTab={authModalTab}
       />

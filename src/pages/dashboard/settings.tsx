@@ -7,9 +7,25 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Settings as SettingsIcon, Upload, Trash2 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import AuthProvider, { useAuth } from '@/hooks/AuthProvider';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { useTheme } from '@/components/theme/theme-provider';
 
 export default function Settings() {
+
+  const { user } = useAuth()
+  const { theme, setTheme } = useTheme();
+
+  const [avatarUrl, setAvatarUrl] = useState('');
+  useEffect(() => {
+    setAvatarUrl(user && user?.profileUrl ? user?.profileUrl : "https://github.com/shadcn.png")
+
+  }, [user])
+
   return (
     <DashboardLayout title="Settings">
       <Card className="border-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-lg">
@@ -30,27 +46,61 @@ export default function Settings() {
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="billing">Billing</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="general" className="space-y-6">
               <div className="space-y-4">
+
+                <h3 className="text-lg font-medium">Profile Picture</h3>
+                <div className="flex items-start gap-6">
+                  <Avatar className="h-24 w-24 border-4 border-white dark:border-gray-800 shadow-md">
+                    <AvatarImage src={avatarUrl ? avatarUrl : "https://github.com/shadcn.png"} alt="Profile" />
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Button variant="outline" className="relative">
+                        <input
+                          type="file"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          accept="image/*"
+                        // onChange={handleImageUpload}
+                        />
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload New
+                      </Button>
+                      <Button
+                        variant="destructive"
+                      // onClick={handleRemoveImage}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Remove
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Recommended: Square image, at least 400x400px
+                    </p>
+                  </div>
+                </div>
+
+
                 <h3 className="text-lg font-medium">Profile Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name</Label>
-                    <Input id="fullName" defaultValue="John Doe" />
+                    <Input id="fullName" defaultValue="John Doe" value={user?.fullName} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" defaultValue="john.doe@example.com" />
+                    <Input id="email" defaultValue="john.doe@example.com" value={user?.email} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="company">Company (Optional)</Label>
-                    <Input id="company" defaultValue="Acme Inc." />
+                    <Input id="company" defaultValue="Acme Inc." value={user?.company} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="timezone">Timezone</Label>
+                    <Label htmlFor="timezone" >Timezone</Label>
                     <Select defaultValue="utc-8">
-                      <SelectTrigger>
+                      <SelectTrigger >
                         <SelectValue placeholder="Select timezone" />
                       </SelectTrigger>
                       <SelectContent>
@@ -65,15 +115,15 @@ export default function Settings() {
                     </Select>
                   </div>
                 </div>
-                
+
                 <div className="pt-4">
                   <Button>Save Changes</Button>
                 </div>
               </div>
-              
+
               <div className="space-y-4 pt-4">
                 <h3 className="text-lg font-medium">Theme & Appearance</h3>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -82,10 +132,20 @@ export default function Settings() {
                         Enable dark mode for the interface
                       </p>
                     </div>
-                    <Switch id="darkMode" />
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                    >
+                      {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                    </Button>
+
+
+                  {/* <Switch className='text-white' onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} /> */}
                   </div>
-                  
-                  <div className="flex items-center justify-between">
+
+                  {/* <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="compactMode" className="text-base">Compact Mode</Label>
                       <p className="text-sm text-muted-foreground">
@@ -93,15 +153,16 @@ export default function Settings() {
                       </p>
                     </div>
                     <Switch id="compactMode" />
-                  </div>
+                  </div> */}
+                  
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="privacy" className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Security Settings</h3>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -110,9 +171,11 @@ export default function Settings() {
                         Add an extra layer of security to your account
                       </p>
                     </div>
-                    <Switch id="2fa" />
+                    <Switch id="2fa" checked={user?.twoFa} />
+
+
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="password">Change Password</Label>
                     <Input id="password" type="password" placeholder="••••••••" />
@@ -121,16 +184,16 @@ export default function Settings() {
                     <Label htmlFor="confirmPassword">Confirm New Password</Label>
                     <Input id="confirmPassword" type="password" placeholder="••••••••" />
                   </div>
-                  
+
                   <div className="pt-2">
                     <Button>Update Password</Button>
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-4 pt-4">
                 <h3 className="text-lg font-medium">Privacy Controls</h3>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -150,7 +213,7 @@ export default function Settings() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="analytics" className="text-base">Usage Analytics</Label>
@@ -163,11 +226,11 @@ export default function Settings() {
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="notifications" className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Email Notifications</h3>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -178,7 +241,7 @@ export default function Settings() {
                     </div>
                     <Switch id="fileShared" defaultChecked />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="commentNotif" className="text-base">Comments</Label>
@@ -188,7 +251,7 @@ export default function Settings() {
                     </div>
                     <Switch id="commentNotif" defaultChecked />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="storageNotif" className="text-base">Storage Limits</Label>
@@ -198,7 +261,7 @@ export default function Settings() {
                     </div>
                     <Switch id="storageNotif" defaultChecked />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="marketingNotif" className="text-base">Marketing</Label>
@@ -211,11 +274,11 @@ export default function Settings() {
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="billing" className="space-y-6">
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Billing Information</h3>
-                
+
                 <div className="rounded-lg border border-gray-200 dark:border-gray-800 p-4">
                   <div className="flex items-center justify-between mb-4">
                     <div>
@@ -224,7 +287,7 @@ export default function Settings() {
                     </div>
                     <Button>Upgrade to Pro</Button>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span>Storage</span>
@@ -235,7 +298,7 @@ export default function Settings() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                   <Card className="bg-white/80 dark:bg-gray-900/80">
                     <CardHeader className="pb-3">
@@ -248,7 +311,7 @@ export default function Settings() {
                       <p>30-day file recovery</p>
                     </CardContent>
                   </Card>
-                  
+
                   <Card className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-200 dark:border-blue-800">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
@@ -266,7 +329,7 @@ export default function Settings() {
                       <p>Priority support</p>
                     </CardContent>
                   </Card>
-                  
+
                   <Card className="bg-white/80 dark:bg-gray-900/80">
                     <CardHeader className="pb-3">
                       <CardTitle>Enterprise</CardTitle>

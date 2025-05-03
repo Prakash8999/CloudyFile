@@ -73,7 +73,7 @@ export default function Sidebar() {
         </nav>
       </ScrollArea>
       
-      <div className="p-4">
+      {/* <div className="p-4">
         <div className="rounded-lg bg-gradient-to-br from-blue-900 to-indigo-900 shadow-lg p-4 md:p-6 text-white overflow-hidden relative">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-xl"></div>
           <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-indigo-500/20 rounded-full blur-xl"></div>
@@ -85,7 +85,7 @@ export default function Sidebar() {
             See Plans
           </Button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

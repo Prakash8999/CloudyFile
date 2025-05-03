@@ -9,6 +9,7 @@ import axios from 'axios';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../common/BaseUrl';
+import { useAuth } from '@/hooks/AuthProvider';
 
 interface AuthModalProps {
   open: boolean;
@@ -28,6 +29,8 @@ export default function AuthModal({ open, onOpenChange, defaultTab = 'login' }: 
     name: '',
   });
 
+  // const { setToken } = useAuth()
+const {setToken} = useAuth()
 
   const handleLogin = async () => {
     try {
@@ -36,8 +39,8 @@ export default function AuthModal({ open, onOpenChange, defaultTab = 'login' }: 
         email: formData.email,
         password: formData.password,
       });
-      const  data  = resLogin.data;
-      if(data?.data?.otp){
+      const data = resLogin.data;
+      if (data?.data?.otp) {
         setShowOtpModal(true); // Show OTP modal if OTP is required
         setUserEmail(formData.email); // Set user email for OTP verification
         const message = data?.message || 'OTP sent to your registered email for two-factor authentication. Please verify to continue.';
@@ -46,6 +49,7 @@ export default function AuthModal({ open, onOpenChange, defaultTab = 'login' }: 
         return
       }
       localStorage.setItem('token', data?.data?.token); // Save token after successful login
+      setToken(data?.data?.token)
       const message = data?.message || 'Logged in successfully!';
       toast.success(message);
       navigate(data?.data?.redirectUrl); // Use navigate instead of redirect
@@ -56,7 +60,7 @@ export default function AuthModal({ open, onOpenChange, defaultTab = 'login' }: 
         setShowOtpModal(true); // Show OTP modal if OTP is required
         setUserEmail(formData.email); // Set user email for OTP verification
         toast.error('OTP sent to your email. Please verify to continue.', { duration: 5000 });
-      } 
+      }
 
       setIsLoading(false);
       toast.error(errorMessage);
@@ -90,6 +94,7 @@ export default function AuthModal({ open, onOpenChange, defaultTab = 'login' }: 
       });
       const { data } = res.data;
       localStorage.setItem('token', data.token);
+      setToken(data?.token)
       toast.success(`${type === 'login' ? 'Logged in' : 'Signed up'} successfully!`);
       navigate(data.redirectUrl); // Use navigate instead of redirect
       console.log('Google login successful', data.redirectUrl);
@@ -122,6 +127,7 @@ export default function AuthModal({ open, onOpenChange, defaultTab = 'login' }: 
       });
       const { data } = res.data;
       localStorage.setItem('token', data.token); // Save token after successful OTP verification
+      setToken(data.token)
       toast.success('Account verified successfully!');
       setIsLoading(false);
       setShowOtpModal(false); // Close OTP Modal
@@ -139,138 +145,138 @@ export default function AuthModal({ open, onOpenChange, defaultTab = 'login' }: 
 
   return (
     <>
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        {
-          !showOtpModal ? (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          {
+            !showOtpModal ? (
 
 
-            <>
+              <>
 
-              <DialogHeader>
-                <DialogTitle>Welcome to Cloudyfile</DialogTitle>
-                <DialogDescription>
-                  Secure cloud storage for all your files
-                </DialogDescription>
-              </DialogHeader>
+                <DialogHeader>
+                  <DialogTitle>Welcome to Cloudyfile</DialogTitle>
+                  <DialogDescription>
+                    Secure cloud storage for all your files
+                  </DialogDescription>
+                </DialogHeader>
 
-              <Tabs defaultValue={defaultTab} className="w-full">
-                <TabsList className="grid grid-cols-2 w-full">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                </TabsList>
+                <Tabs defaultValue={defaultTab} className="w-full">
+                  <TabsList className="grid grid-cols-2 w-full">
+                    <TabsTrigger value="login">Login</TabsTrigger>
+                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="login" className="space-y-4 mt-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email-login">Email</Label>
-                      <Input id="email-login" type="email" placeholder="john@example.com" name='email' onChange={handleChange} />
+                  <TabsContent value="login" className="space-y-4 mt-4">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email-login">Email</Label>
+                        <Input id="email-login" type="email" placeholder="john@example.com" name='email' onChange={handleChange} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password-login">Password</Label>
+                        <Input id="password-login" type="password" name='password' onChange={handleChange} />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password-login">Password</Label>
-                      <Input id="password-login" type="password" name='password' onChange={handleChange} />
+
+                    <div className="flex items-center">
+                      <div className="flex-grow border-t border-gray-200 dark:border-gray-800"></div>
+                      <span className="px-4 text-sm text-gray-500">or continue with</span>
+                      <div className="flex-grow border-t border-gray-200 dark:border-gray-800"></div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center">
-                    <div className="flex-grow border-t border-gray-200 dark:border-gray-800"></div>
-                    <span className="px-4 text-sm text-gray-500">or continue with</span>
-                    <div className="flex-grow border-t border-gray-200 dark:border-gray-800"></div>
-                  </div>
+                    <div className="">
+                      <GoogleLogin onSuccess={(credentialResponse) => handleSuccess(credentialResponse, 'login')}
+                        onError={handleError} />
 
-                  <div className="">
-                    <GoogleLogin onSuccess={(credentialResponse) => handleSuccess(credentialResponse, 'login')}
-                      onError={handleError} />
-
-                  </div>
-
-                  <Button
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                    disabled={isLoading}
-                    onClick={handleLogin}
-                  >
-                    {isLoading ? 'Logging in...' : 'Login'}
-                  </Button>
-                </TabsContent>
-
-                <TabsContent value="signup" className="space-y-4 mt-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name-signup">Full Name</Label>
-                      <Input id="name-signup" placeholder="John Doe" onChange={handleChange} name='name' />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email-signup">Email</Label>
-                      <Input id="email-signup" type="email" placeholder="john@example.com" onChange={handleChange} name='email' />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password-signup">Password</Label>
-                      <Input id="password-signup" type="password" onChange={handleChange} name='password' />
-                    </div>
-                  </div>
 
-                  <div className="flex items-center">
-                    <div className="flex-grow border-t border-gray-200 dark:border-gray-800"></div>
-                    <span className="px-4 text-sm text-gray-500">or continue with</span>
-                    <div className="flex-grow border-t border-gray-200 dark:border-gray-800"></div>
-                  </div>
+                    <Button
+                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                      disabled={isLoading}
+                      onClick={handleLogin}
+                    >
+                      {isLoading ? 'Logging in...' : 'Login'}
+                    </Button>
+                  </TabsContent>
 
-                  <div className="">
-                    {/* <Button variant="outline" onClick={() => handleSubmit('signup')}>
+                  <TabsContent value="signup" className="space-y-4 mt-4">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name-signup">Full Name</Label>
+                        <Input id="name-signup" placeholder="John Doe" onChange={handleChange} name='name' />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email-signup">Email</Label>
+                        <Input id="email-signup" type="email" placeholder="john@example.com" onChange={handleChange} name='email' />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password-signup">Password</Label>
+                        <Input id="password-signup" type="password" onChange={handleChange} name='password' />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center">
+                      <div className="flex-grow border-t border-gray-200 dark:border-gray-800"></div>
+                      <span className="px-4 text-sm text-gray-500">or continue with</span>
+                      <div className="flex-grow border-t border-gray-200 dark:border-gray-800"></div>
+                    </div>
+
+                    <div className="">
+                      {/* <Button variant="outline" onClick={() => handleSubmit('signup')}>
                 <Github className="mr-2 h-4 w-4" />
                 Github
               </Button> */}
-                    <GoogleLogin onSuccess={(credentialResponse) => handleSuccess(credentialResponse, 'signup')}
-                      onError={handleError} />
+                      <GoogleLogin onSuccess={(credentialResponse) => handleSuccess(credentialResponse, 'signup')}
+                        onError={handleError} />
 
-                  </div>
+                    </div>
 
-                  <Button
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                    disabled={isLoading}
-                    onClick={handleSignup}
-                  >
-                    {isLoading ? 'Creating account...' : 'Create Account'}
-                  </Button>
-                </TabsContent>
-              </Tabs>
-            </>
-          ) :
+                    <Button
+                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                      disabled={isLoading}
+                      onClick={handleSignup}
+                    >
+                      {isLoading ? 'Creating account...' : 'Create Account'}
+                    </Button>
+                  </TabsContent>
+                </Tabs>
+              </>
+            ) :
 
-            <div className="space-y-6">
-              <DialogHeader>
-                <DialogTitle>Enter OTP</DialogTitle>
-                <DialogDescription>
-                  An OTP has been sent to {userEmail}. Please enter it below to verify your account.
-                </DialogDescription>
-              </DialogHeader>
+              <div className="space-y-6">
+                <DialogHeader>
+                  <DialogTitle>Enter OTP</DialogTitle>
+                  <DialogDescription>
+                    An OTP has been sent to {userEmail}. Please enter it below to verify your account.
+                  </DialogDescription>
+                </DialogHeader>
 
-              <div className="space-y-4">
-                <Label htmlFor="otp">OTP</Label>
-                <Input
-                  id="otp"
-                  placeholder="Enter OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                />
+                <div className="space-y-4">
+                  <Label htmlFor="otp">OTP</Label>
+                  <Input
+                    id="otp"
+                    placeholder="Enter OTP"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                  />
+                </div>
+
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  disabled={isLoading}
+                  onClick={handleVerifyOtp}
+                >
+                  {isLoading ? 'Verifying...' : 'Verify OTP'}
+                </Button>
               </div>
 
-              <Button
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                disabled={isLoading}
-                onClick={handleVerifyOtp}
-              >
-                {isLoading ? 'Verifying...' : 'Verify OTP'}
-              </Button>
-            </div>
 
+          }
 
-        }
+        </DialogContent>
+      </Dialog>
 
-      </DialogContent>
-    </Dialog>
-
-    <Toaster richColors />
+      <Toaster richColors />
     </>
   );
 }
