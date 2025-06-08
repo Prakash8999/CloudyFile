@@ -125,12 +125,26 @@ export default function UploadModal({ open, onOpenChange }: UploadModalProps) {
         signal: newController.signal
 
       }
-      const uploadRes = await axios.put(getUrl.data?.data, files[0], config);
+      const uploadRes = await axios.put(getUrl.data?.data.uploadUrl, files[0], config);
       if (!uploadRes || uploadRes.statusText !== 'OK') {
         setIsUploading(false);
         toast.error('Failed to upload file');
       }
+
+
       console.log(uploadRes)
+
+      const confrimUpload = await axios.post(`${BASE_URL}/file/upload/confirm`, {
+        success: true,
+        fileId: getUrl.data?.data.fileId,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          "x-auth-token": `Bearer ${token}`
+        }
+      })
+      console.log( "confrimUpload " , confrimUpload)
+
 
       setIsUploading(false);
       toast.success(`${files.length} files uploaded successfully`);
