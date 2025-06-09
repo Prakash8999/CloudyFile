@@ -34,6 +34,7 @@ export default function UploadModal({ open, onOpenChange }: UploadModalProps) {
   const [files, setFiles] = useState<File[]>([]);
   const { token } = useAuth()
   const [controller, setController] = useState<AbortController | null>(null);
+  const {setDataPost, dataPost} = useAuth()
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(prev => [...prev, ...acceptedFiles]);
@@ -130,9 +131,13 @@ export default function UploadModal({ open, onOpenChange }: UploadModalProps) {
         setIsUploading(false);
         toast.error('Failed to upload file');
       }
+      setDataPost({
+        file: dataPost.file + 1
+      })
 
 
       console.log(uploadRes)
+
 
       const confrimUpload = await axios.post(`${BASE_URL}/file/upload/confirm`, {
         success: true,

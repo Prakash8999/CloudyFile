@@ -1,5 +1,6 @@
 // AuthContext.tsx
 import { BASE_URL } from "@/components/common/BaseUrl";
+import { FileUploadedState } from "@/types/FileAttributes";
 import axios from "axios";
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,8 @@ interface AuthContextType {
   setUser: (user: User | null) => void;
   token: string;
   setToken: (token: string) => void;
+  dataPost: FileUploadedState;
+  setDataPost: ( dataPost: FileUploadedState) => void;
 }
 
 // Create the context with an initial empty value
@@ -39,7 +42,9 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string>(localStorage.getItem("token") || "");
-
+  const [dataPost, setDataPost] = useState<FileUploadedState>({
+    file: 0,
+  });
   const [tokenError, setTokenError] = useState(false)
   const location = useLocation();
 
@@ -129,7 +134,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 
   return (
-    <AuthContext.Provider value={{ token, user, setUser, setToken }}>
+    <AuthContext.Provider value={{ token, user, setUser, setToken , dataPost, setDataPost}}>
       {children}
     </AuthContext.Provider>
   )
