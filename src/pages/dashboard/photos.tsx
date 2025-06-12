@@ -1,7 +1,7 @@
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Image } from 'lucide-react';
+import { UploadCloud, Image, Loader } from 'lucide-react';
 import FileCard from '@/components/dashboard/FileCard';
 import { useEffect, useState } from 'react';
 import UploadModal from '@/components/common/UploadModal';
@@ -10,11 +10,13 @@ import { BASE_URL } from '@/components/common/BaseUrl';
 import { useAuth } from '@/hooks/AuthProvider';
 import { FileAttributes } from '@/types/FileAttributes';
 import { toast, Toaster } from 'sonner';
+import { useFileData } from '@/hooks/useFileData';
+import MediaViewer from '@/components/viewers/MediaViewer';
 
 export default function Photos() {
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [photos, setPhotos] = useState<FileAttributes[]>([]);
-  const [loading, setLoading] = useState(false)
+    const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
   // const photos = [
   //   {
@@ -66,30 +68,24 @@ export default function Photos() {
   //     isFavorite: false
   //   }
   // ];
-  const { token, dataPost } = useAuth()
-  const fileData = async () => {
-    try {
-      setLoading(true)
 
-      const response = await axios.get(`${BASE_URL}/file/read?fileType=image`, {
-        headers: { "x-auth-token": `Bearer ${token}` }
-      });
-      console.log("response ", response.data.data)
-      setPhotos(response.data.data)
-      setLoading(false)
-    } catch (error: any) {
-      console.log("error", error)
-      toast.error(error.response?.data?.message)
-    }
-  }
-  useEffect(() => {
-    fileData()
-  }, [dataPost.file])
+  const {data:photos,loading} =useFileData('image')
 
+const handlePhotoClick = (index: number) => {
+    setCurrentMediaIndex(index);
+    setMediaViewerOpen(true);
+  };
+//  if (loading) return <Loader className='animate-spin' />;
 
   return (
     <DashboardLayout title="Photo Gallery">
+     
       <div className="space-y-6">
+        {
+        loading  ? <Loader className='animate-spin' /> :
+       
+
+
         <Card className="border-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-lg">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -110,21 +106,37 @@ export default function Photos() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {photos.map((photo) => (
+              {photos.map((photo, index) => (
                 <FileCard
                   key={photo.id}
+                  fileId = { photo.id}
                   type="image"
                   title={photo.fileName}
                   thumbnail={photo.thumbnailUrl ? photo.thumbnailUrl : "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/picture_12236741.png"}
                   isFavorite={photo.isFavorite ? photo.isFavorite : false}
+                onClick={() => handlePhotoClick(index)}
                 />
               ))}
             </div>
           </CardContent>
         </Card>
+}
       </div>
       <UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
       <Toaster richColors />
+
+      {
+        mediaViewerOpen && 
+            <MediaViewer
+        open={mediaViewerOpen}
+        onOpenChange={setMediaViewerOpen}
+        files={photos || []}
+        currentIndex={currentMediaIndex}
+        onIndexChange={setCurrentMediaIndex}
+      />
+      }
+        
+        
     </DashboardLayout>
   );
 }

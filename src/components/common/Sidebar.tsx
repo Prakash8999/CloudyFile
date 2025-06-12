@@ -10,7 +10,9 @@ import {
   Archive, 
   Trash2, 
   Settings, 
-  User
+  User,
+  FileAudioIcon,
+  Music
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -25,6 +27,7 @@ export default function Sidebar() {
     { name: 'Videos', href: '/dashboard/videos', icon: VideoIcon, new: true },
     { name: 'Photo Gallery', href: '/dashboard/photos', icon: ImageIcon, new: false },
     { name: 'Documents', href: '/dashboard/documents', icon: FileText, new: true },
+    { name: 'Audios', href: '/dashboard/audios', icon: Music, new: true },
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart2, new: false },
     { name: 'Favorites', href: '/dashboard/favorites', icon: Star, new: false },
     { name: 'Archive', href: '/dashboard/archive', icon: Archive, new: false },

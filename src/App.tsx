@@ -3,6 +3,7 @@ import Dashboard from '@/pages/dashboard';
 import Videos from '@/pages/dashboard/videos';
 import Photos from '@/pages/dashboard/photos';
 import Documents from '@/pages/dashboard/documents';
+import Audios from '@/pages/dashboard/audios';
 import Analytics from '@/pages/dashboard/analytics';
 import Favorites from '@/pages/dashboard/favorites';
 import Archive from '@/pages/dashboard/archive';
@@ -28,6 +29,7 @@ function App() {
         <Route path="/dashboard/videos" element={<Videos />} />
         <Route path="/dashboard/photos" element={<Photos />} />
         <Route path="/dashboard/documents" element={<Documents />} />
+        <Route path="/dashboard/audios" element={<Audios />} />
         <Route path="/dashboard/analytics" element={<Analytics />} />
         <Route path="/dashboard/favorites" element={<Favorites />} />
         <Route path="/dashboard/archive" element={<Archive />} />

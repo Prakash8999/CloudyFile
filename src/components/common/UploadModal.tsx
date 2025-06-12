@@ -155,12 +155,13 @@ export default function UploadModal({ open, onOpenChange }: UploadModalProps) {
       toast.success(`${files.length} files uploaded successfully`);
       setFiles([]);
       onOpenChange(false);
-    } catch (error) {
+    } catch (error:any) {
       if (axios.isCancel(error)) {
         toast.error('Upload Cancelled');
         console.log("Cancelled:", error.message);
       } else {
-        console.error("Upload error:", error);
+        toast.error(error.response?.data?.message);
+        console.error("Upload error:", error.data);
       }
       console.log(error)
     }
