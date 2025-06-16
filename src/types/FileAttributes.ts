@@ -25,6 +25,7 @@ export interface FileAttributes {
 }
 
 
-export interface FileUploadedState {
+export interface UploadState {
   file: number; // allows adding more keys in the future without TypeScript error
+  // folder?: number
 }

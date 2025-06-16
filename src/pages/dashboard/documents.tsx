@@ -3,13 +3,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { UploadCloud, FileText, Loader } from 'lucide-react';
 import FileCard from '@/components/dashboard/FileCard';
-import { useState } from 'react';
+import { MouseEvent, useState } from 'react';
 import UploadModal from '@/components/common/UploadModal';
-import { useFileData } from '@/hooks/useFileData';
+import { useFileData, useFileDataById } from '@/hooks/useFileData';
+import DocumentViewer from '@/components/viewers/DocumentViewer';
+import axios from 'axios';
+import { BASE_URL } from '@/components/common/BaseUrl';
+import { useAuth } from '@/hooks/AuthProvider';
 
 export default function Documents() {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-
+  const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
+  const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
+const [newLoading, setNewLoading] = useState(false)
   // const documents = [
   //   {
   //     id: '1',
@@ -53,48 +59,89 @@ export default function Documents() {
   //   }
   // ];
 
-    const {data:documents,loading} =useFileData('application')
+  const { data: documents, loading } = useFileData('application')
+  const handleDocumentClick = (index: number) => {
+    setCurrentDocumentIndex(index);
+    setDocumentViewerOpen(true);
+  };
+
+const {token} = useAuth()
+  const getFileUrlById = async (fileId: number): Promise<string> => {
+  setNewLoading(true)
   
+    const response = await axios.get(`${BASE_URL}/file/read/${fileId}`, {
+    headers: { "x-auth-token": `Bearer ${token}` },
+  });
+const fileUrl = response.data?.data
+setNewLoading(false)
+  return fileUrl;
+};
+
+const openUrl = async ( fileId: number) => {
+  // event.preventDefault(); // Stop default anchor behavior
+
+  try {
+    const url = await getFileUrlById(fileId); 
+    window.open(url, '_blank'); // Open the signed URL in a new tab
+  } catch (err) {
+    console.error('Failed to fetch file URL:', err);
+  }
+};
 
   return (
     <DashboardLayout title="Documents">
       <div className="space-y-6">
         {
-        loading  ? <Loader  className='animate-spin' /> :
-       
-        <Card className="border-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-lg">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  My Documents
-                </CardTitle>
-                <CardDescription>
-                  Manage all your document files
-                </CardDescription>
-              </div>
-              <Button onClick={() => setUploadModalOpen(true)}>
-                <UploadCloud className="mr-2 h-4 w-4" />
-                Upload Document
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {documents.map((document) => (
-                <FileCard
-                  key={document.id}
-                  type="document"
-                  title={document.fileName}
-                  isFavorite={document.isFavorite ? true  : false} 
-                />
-              ))}
-            </div>
-          </CardContent>
-        </Card> }
+          loading ? <Loader className='animate-spin' /> :
+
+            <Card className="border-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-lg">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      My Documents
+                    </CardTitle>
+                    <CardDescription>
+                      Manage all your document files
+                    </CardDescription>
+                  </div>
+                  <Button onClick={() => setUploadModalOpen(true)}>
+                    <UploadCloud className="mr-2 h-4 w-4" />
+                    Upload Document
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ${newLoading ? 'cursor-wait' : ''}`}>
+                  {documents.map((document) => (
+                    <FileCard
+                      fileId={document.id}
+                      key={document.id}
+                      type='application'
+                      newLoading = {newLoading}
+                      title={document.fileName}
+                      isFavorite={document.isFavorite ? true : false}
+                      onClick={() => openUrl(document.id)}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>}
       </div>
       <UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
+      {/* {
+        documentViewerOpen &&
+        <DocumentViewer
+          open={documentViewerOpen}
+          onOpenChange={setDocumentViewerOpen}
+          files={documents || []}
+          currentIndex={currentDocumentIndex}
+          onIndexChange={setCurrentDocumentIndex}
+        />
+      } */}
+
+
     </DashboardLayout>
   );
 }

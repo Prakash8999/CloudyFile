@@ -132,7 +132,7 @@ export default function Profile() {
                   {recentFiles.map((file) => (
                     <FileCard
                       key={file.id}
-                      type={file.type as 'audio' | 'document' | 'image' | 'video'}
+                      type={file.type as 'audio' | 'application' | 'image' | 'video'}
                       title={file.title}
                       thumbnail={file.thumbnail}
                       isFavorite={file.isFavorite}

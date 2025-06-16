@@ -1,6 +1,7 @@
 // AuthContext.tsx
 import { BASE_URL } from "@/components/common/BaseUrl";
-import { FileUploadedState } from "@/types/FileAttributes";
+import { UploadState } from "@/types/FileAttributes";
+import { UploadEvents } from "@/types/generics";
 import axios from "axios";
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -27,8 +28,10 @@ interface AuthContextType {
   setUser: (user: User | null) => void;
   token: string;
   setToken: (token: string) => void;
-  dataPost: FileUploadedState;
-  setDataPost: ( dataPost: FileUploadedState) => void;
+  dataPost: UploadState;
+  setDataPost: ( dataPost: UploadState) => void;
+  uploadEvents: UploadEvents;
+  triggerUploadEvent: (type: keyof UploadEvents) => void; // ✅ this is correct now
 }
 
 // Create the context with an initial empty value
@@ -42,13 +45,25 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string>(localStorage.getItem("token") || "");
-  const [dataPost, setDataPost] = useState<FileUploadedState>({
+  const [dataPost, setDataPost] = useState<UploadState>({
     file: 0,
   });
   const [tokenError, setTokenError] = useState(false)
   const location = useLocation();
+  const [uploadEvents, setUploadEvents] = useState<UploadEvents>({
+  file: 0,
+  folder: 0,
+  archive: 0,
+  shared: 0,
+});
 
 
+const triggerUploadEvent = (type: keyof UploadEvents) => {
+  setUploadEvents(prev => ({
+    ...prev,
+    [type]: prev[type] + 1,
+  }));
+};
 
   const navigate = useNavigate()
   // const token = localStorage.getItem("token") || ""
@@ -134,7 +149,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 
   return (
-    <AuthContext.Provider value={{ token, user, setUser, setToken , dataPost, setDataPost}}>
+    <AuthContext.Provider value={{ token, user, setUser, setToken , dataPost, setDataPost, uploadEvents, triggerUploadEvent}}>
       {children}
     </AuthContext.Provider>
   )

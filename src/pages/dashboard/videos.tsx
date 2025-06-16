@@ -97,7 +97,7 @@ export default function Videos() {
                       type="video"
                       title={video.fileName}
                       thumbnail={video.thumbnailUrl ? video.thumbnailUrl : "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/5617bgr.jpg"}
-                      isFavorite={true}
+                      isFavorite={video.isFavorite ? true : false}
                       onClick={() => handleVideoClick(index)}
 
                     />

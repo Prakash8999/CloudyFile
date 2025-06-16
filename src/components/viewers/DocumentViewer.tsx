@@ -2,50 +2,56 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  X, 
-  ChevronLeft, 
-  ChevronRight, 
-  ZoomIn, 
-  ZoomOut, 
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  ZoomOut,
   RotateCw,
   Download,
   PanelLeftClose,
   PanelLeftOpen
 } from 'lucide-react';
+import { FileAttributes } from '@/types/FileAttributes';
+import { useFileDataById } from '@/hooks/useFileData';
 
-interface DocumentFile {
-  id: string;
-  title: string;
-  pages?: number;
-  url?: string;
-}
+// interface DocumentFile {
+//   id: string;
+//   title: string;
+//   pages?: number;
+//   url?: string;
+// }
 
 interface DocumentViewerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  files: DocumentFile[];
+  files: FileAttributes[];
   currentIndex: number;
   onIndexChange: (index: number) => void;
 }
 
-export default function DocumentViewer({ 
-  open, 
-  onOpenChange, 
-  files, 
-  currentIndex, 
-  onIndexChange 
+export default function DocumentViewer({
+  open,
+  onOpenChange,
+  files,
+  currentIndex,
+  onIndexChange
 }: DocumentViewerProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
   const [showSidebar, setShowSidebar] = useState(true);
   const currentFile = files[currentIndex];
-  const totalPages = currentFile?.pages || 10; // Default to 10 pages for demo
+  // const totalPages = currentFile?.pages || 10; // Default to 10 pages for demo
+  const totalPages = 10; // Default to 10 pages for demo
+  const { data: urlData, loading } = useFileDataById(currentFile.id, open)
+  console.log("urlData ", urlData);
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!open) return;
-      
+
       if (e.key === 'ArrowLeft' && currentIndex > 0) {
         onIndexChange(currentIndex - 1);
       } else if (e.key === 'ArrowRight' && currentIndex < files.length - 1) {
@@ -92,23 +98,22 @@ export default function DocumentViewer({
           {showSidebar && (
             <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="font-medium text-sm truncate">{currentFile.title}</h3>
+                <h3 className="font-medium text-sm truncate">{currentFile.fileName}</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {totalPages} pages
                 </p>
               </div>
-              
+
               <ScrollArea className="flex-1 p-2">
                 <div className="grid grid-cols-2 gap-2">
                   {Array.from({ length: totalPages }, (_, i) => (
                     <button
                       key={i + 1}
                       onClick={() => setCurrentPage(i + 1)}
-                      className={`aspect-[3/4] border-2 rounded-lg overflow-hidden transition-all ${
-                        currentPage === i + 1
+                      className={`aspect-[3/4] border-2 rounded-lg overflow-hidden transition-all ${currentPage === i + 1
                           ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
                           : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
+                        }`}
                     >
                       <div className="w-full h-full bg-white dark:bg-gray-700 flex items-center justify-center">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -138,27 +143,27 @@ export default function DocumentViewer({
                     <PanelLeftOpen className="h-4 w-4" />
                   )}
                 </Button>
-                
+
                 <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
-                
+
                 <Button variant="ghost" size="sm" onClick={handleZoomOut}>
                   <ZoomOut className="h-4 w-4" />
                 </Button>
-                
+
                 <span className="text-sm font-medium min-w-[60px] text-center">
                   {zoom}%
                 </span>
-                
+
                 <Button variant="ghost" size="sm" onClick={handleZoomIn}>
                   <ZoomIn className="h-4 w-4" />
                 </Button>
-                
+
                 <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
-                
+
                 <Button variant="ghost" size="sm">
                   <RotateCw className="h-4 w-4" />
                 </Button>
-                
+
                 <Button variant="ghost" size="sm">
                   <Download className="h-4 w-4" />
                 </Button>
@@ -168,9 +173,9 @@ export default function DocumentViewer({
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   Page {currentPage} of {totalPages}
                 </span>
-                
+
                 <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -181,7 +186,7 @@ export default function DocumentViewer({
                   <ChevronLeft className="h-4 w-4" />
                   Previous Doc
                 </Button>
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -192,7 +197,7 @@ export default function DocumentViewer({
                   Next Doc
                   <ChevronRight className="h-4 w-4" />
                 </Button>
-                
+
                 <Button
                   variant="ghost"
                   size="sm"
@@ -206,22 +211,26 @@ export default function DocumentViewer({
             {/* Document Content */}
             <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-4">
               <div className="flex justify-center">
-                <div 
-                  className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
-                  style={{ 
-                    width: `${(595 * zoom) / 100}px`, 
-                    height: `${(842 * zoom) / 100}px` 
+                <div
+                  className="bg-black dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 rounded-lg overflow-y-auto"
+                  style={{
+                    width: `${(595 * zoom) / 100}px`,
+                    height: `${(650 * zoom) / 100}px`
                   }}
                 >
-                  <div className="w-full h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
-                    <div className="text-center">
-                      <p className="text-lg font-medium mb-2">Page {currentPage}</p>
-                      <p className="text-sm">{currentFile.title}</p>
-                      <p className="text-xs mt-4 opacity-70">
-                        Document content would be rendered here
-                      </p>
+                  {/* <div className="w-full h-full flex items-center justify-center text-gray-500 dark:text-gray-400"> */}
+                    <div className="text-center ">
+                      {/* <p className="text-lg font-medium mb-2">Page {currentPage}</p>
+                      <p className="text-sm">{currentFile.fileName}</p> */}
+                      {/* <iframe
+                        src={`https://docs.google.com/gview?url=${encodeURIComponent(urlData!)}&embedded=true`}
+                        // style={{ width: 'screen', height: '100%' }}
+                        className='w-full h-full'
+                        frameBorder="1"
+                        title="Document Viewer"
+                      /> */}
                     </div>
-                  </div>
+                  {/* </div>  */}
                 </div>
               </div>
             </div>
@@ -236,11 +245,11 @@ export default function DocumentViewer({
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              
+
               <span className="text-sm font-medium px-4">
                 {currentPage} / {totalPages}
               </span>
-              
+
               <Button
                 variant="ghost"
                 size="sm"

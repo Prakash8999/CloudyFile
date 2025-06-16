@@ -36,7 +36,7 @@ export default function MediaViewer({
   const currentFile = files[currentIndex];
   console.log("currentFile", currentFile);
 
-
+console.log("current file url", currentFile);
   const { data: urlData, loading } = useFileDataById(currentFile.id, open)
   console.log("urlData ", urlData);
 

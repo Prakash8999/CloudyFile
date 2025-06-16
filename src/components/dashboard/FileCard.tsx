@@ -1,19 +1,25 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Heart, Share2, Trash2, ExternalLink, FileText, FileImage, Pause, AudioLinesIcon, Music2, Music2Icon, Music } from 'lucide-react';
+import { Play, Heart, Share2, Trash2, ExternalLink, FileText, FileImage, Pause, AudioLinesIcon, Music2, Music2Icon, Music, Archive, ArchiveIcon } from 'lucide-react';
 import { useState } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../common/BaseUrl';
+import { useAuth } from '@/hooks/AuthProvider';
+import { toast } from 'sonner';
+import { useDeleteFile } from '@/hooks/useFileData';
 
 interface FileCardProps {
   fileId: number;
-  type: 'audio' | 'document' | 'image' | 'video';
+  type: 'audio' | 'application' | 'image' | 'video';
   title: string;
   thumbnail?: string;
   isFavorite?: boolean;
+  newLoading?: boolean,
   onClick?: () => void;
 
 }
 
-export default function FileCard({fileId, type, title, thumbnail, isFavorite = false, onClick }: FileCardProps) {
+export default function FileCard({ fileId, type, title, thumbnail, isFavorite, onClick, newLoading = false }: FileCardProps) {
   const [favorite, setFavorite] = useState(isFavorite);
   const [isPlaying, setIsPlaying] = useState(false);
   const handleCardClick = () => {
@@ -22,17 +28,40 @@ export default function FileCard({fileId, type, title, thumbnail, isFavorite = f
     }
   };
 
-  const handleActionClick = (e: React.MouseEvent, action: () => void) => {
-    e.stopPropagation();
-    action();
-  };
+  // const handleActionClick = (e: React.MouseEvent, action: () => void) => {
+  //   e.stopPropagation();
+  //   action();
+  // };
+  const { token, dataPost, setDataPost } = useAuth()
+
+
+
+  // console.log("new loading", newLoading);
+  const handleFavoriteClick = async () => {
+    setFavorite(!isFavorite);
+
+    try {
+      const response = await axios.patch(`${BASE_URL}/file/change-status/${fileId}`, { "isFavorite": !isFavorite }, {
+        headers: { "x-auth-token": `Bearer ${token}` },
+      });
+      setDataPost({
+        file: dataPost.file + 1
+      })
+      toast.success(`File ${!favorite ? "added to" : "removed from"} favorites`);
+    } catch (error) {
+      console.log("error ", error);
+      toast.error("Error adding file to favorites");
+    }
+  }
+  
+  const { updateStatus } = useDeleteFile();
 
 
   return (
     <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-200 hover:shadow-md hover:bg-white/90 dark:hover:bg-gray-900/90 h-full"
-      
 
-    >   
+
+    >
       <div className="relative aspect-video group cursor-pointer" onClick={handleCardClick}>
         {type === 'audio' && (
           <div className="w-full h-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -46,14 +75,14 @@ export default function FileCard({fileId, type, title, thumbnail, isFavorite = f
                 variant="outline"
                 className="h-14 w-14 rounded-full bg-black/30 border-white text-white opacity-100 transition-opacity"
               > */}
-                <Music  className='w-10 h-10'/>
+              <Music className='w-10 h-10' />
               {/* </Button> */}
             </div>
           </div>
         )}
 
-        {type === 'document' && (
-          <div className="w-full h-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+        {type === 'application' && (
+          <div className={`${newLoading ? 'cursor-wait' : 'cursor-pointer'}  w-full h-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center`}>
 
             {
               thumbnail ?
@@ -90,19 +119,19 @@ export default function FileCard({fileId, type, title, thumbnail, isFavorite = f
                   className="h-10  w-10 rounded-full bg-black/30 border-white text-white opacity-70 group-hover:opacity-100 transition-opacity"
                   onClick={() => setIsPlaying(!isPlaying)}
                 > */}
-                  {/* {isPlaying ? (
+                {/* {isPlaying ? (
                     <Pause className="h-5 w-5" />
                   ) : (
                     <Play className="h-5 w-5" />
                     )} */}
-                    {/* <Play className="h-5 w-5" /> */}
+                {/* <Play className="h-5 w-5" /> */}
                 {/* </Button> */}
               </div>
             )}
           </>
         )}
 
-        
+
       </div>
 
       <CardContent className="p-4">
@@ -110,44 +139,46 @@ export default function FileCard({fileId, type, title, thumbnail, isFavorite = f
           <div>
             <h3 className="text-sm font-medium truncate w-fit" title={title}>
               {
-                title.length < 10 ? title : title.slice(0,9) + '...'
+                title.length < 10 ? title : title.slice(0, 9) + '...'
               }
             </h3>
           </div>
-          
-          <div className=" flex gap-x-4">
-          <Button
-            size="icon"
-            variant="outline"
-            className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
-            onClick={() => setFavorite(!favorite)}
-          >
-            <Heart className={`h-4 w-4 ${favorite ? 'fill-red-500 text-red-500' : ''}`} />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
-          >
-            <Share2 className="h-4 w-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
 
-        <Button
+          <div className=" flex gap-x-4">
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
+              onClick={handleFavoriteClick}
+            >
+              <Heart className={`h-4 w-4 ${favorite ? 'fill-red-500 text-red-500' : ''}`} />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
+              onClick={() => updateStatus("isArchived", true, fileId)}
+            >
+              <ArchiveIcon className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
+              onClick={() => updateStatus("isDeleted", true, fileId)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <Button
             size="icon"
             variant="ghost"
             className="h-8 w-8 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
           >
-            <ExternalLink className="h-4 w-4" 
-            onClick={handleCardClick}
-            
+            <ExternalLink className="h-4 w-4"
+              onClick={handleCardClick}
+
             />
           </Button>
         </div>

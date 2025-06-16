@@ -15,31 +15,34 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import AuthProvider from './hooks/AuthProvider';
+import FolderPage from './pages/dashboard/folder';
 
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
 
-    <ThemeProvider defaultTheme="light" storageKey="cloudyfile-theme">
-      <AuthProvider>
+      <ThemeProvider defaultTheme="light" storageKey="cloudyfile-theme">
+        <AuthProvider>
 
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/videos" element={<Videos />} />
-        <Route path="/dashboard/photos" element={<Photos />} />
-        <Route path="/dashboard/documents" element={<Documents />} />
-        <Route path="/dashboard/audios" element={<Audios />} />
-        <Route path="/dashboard/analytics" element={<Analytics />} />
-        <Route path="/dashboard/favorites" element={<Favorites />} />
-        <Route path="/dashboard/archive" element={<Archive />} />
-        <Route path="/dashboard/recycle" element={<Recycle />} />
-        <Route path="/dashboard/settings" element={<Settings />} />
-        <Route path="/dashboard/profile" element={<Profile />} />
-      </Routes>
-      </AuthProvider>
-      <Toaster />
-    </ThemeProvider>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/videos" element={<Videos />} />
+            <Route path="/dashboard/photos" element={<Photos />} />
+            <Route path="/dashboard/documents" element={<Documents />} />
+            <Route path="/dashboard/audios" element={<Audios />} />
+            <Route path="/dashboard/analytics" element={<Analytics />} />
+            <Route path="/dashboard/favorites" element={<Favorites />} />
+            <Route path="/dashboard/archive" element={<Archive />} />
+            <Route path="/dashboard/recycle" element={<Recycle />} />
+            <Route path="/dashboard/settings" element={<Settings />} />
+            <Route path="/dashboard/profile" element={<Profile />} />
+            <Route path="/dashboard/folder/:uuid" element={<FolderPage />} />
+
+          </Routes>
+        </AuthProvider>
+        <Toaster />
+      </ThemeProvider>
     </GoogleOAuthProvider>
 
   );
