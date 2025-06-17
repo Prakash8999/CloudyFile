@@ -11,7 +11,8 @@ import {
 	Share2,
 	MoreVertical,
 	UserPlus,
-	Folder as FolderIcon
+	Folder as FolderIcon,
+	Loader
 } from 'lucide-react';
 import FileCard from '@/components/dashboard/FileCard';
 import MediaViewer from '@/components/viewers/MediaViewer';
@@ -23,6 +24,7 @@ import { dateFormat } from '@/lib/utils';
 import axios from 'axios';
 import { BASE_URL } from '@/components/common/BaseUrl';
 import { useAuth } from '@/hooks/AuthProvider';
+import UploadModal from '@/components/common/UploadModal';
 
 export default function FolderPage() {
 	const { uuid } = useParams();
@@ -31,6 +33,8 @@ export default function FolderPage() {
 	const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
 	const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 	const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
+	const [uploadModalOpen, setUploadModalOpen] = useState(false);
+	const { token } = useAuth()
 
 	if (!uuid) {
 		return (
@@ -103,7 +107,6 @@ export default function FolderPage() {
 
 	}
 
-	const { token } = useAuth()
 
 	const getFileUrlById = async (fileId: number): Promise<string> => {
 
@@ -129,10 +132,17 @@ export default function FolderPage() {
 	};
 
 
+
 	return (
+
+
 		<DashboardLayout title={folderData?.name}>
 			<div className="space-y-6">
-				{/* Header */}
+
+
+				{loading && <Loader className='animate-spin' />}
+
+
 				<Card className="border-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-lg">
 					<CardHeader>
 						<div className="flex items-center justify-between">
@@ -154,15 +164,15 @@ export default function FolderPage() {
 									<div>
 										<CardTitle className="text-xl">{folderData.name}</CardTitle>
 										<CardDescription>
-											{folderData.filesCount} files • Created {dateFormat(folderData.createdAt)} • Last modified {dateFormat(folderData.updatedAt)}
+											{folderData?.files?.length} files • Created {dateFormat(folderData.createdAt)} • Last modified {dateFormat(folderData.updatedAt)}
 										</CardDescription>
 									</div>
 								</div>
 							</div>
 
 							<div className="flex items-center gap-2">
-								<Button variant="outline" size="sm">
-									<UploadCloud className="mr-2 h-4 w-4" />
+								<Button variant="outline" size="sm" onClick={() => setUploadModalOpen(true)}>
+									<UploadCloud className="mr-2 h-4 w-4"  />
 									Upload
 								</Button>
 								<Button variant="outline" size="sm">
@@ -180,12 +190,12 @@ export default function FolderPage() {
 										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
-										<DropdownMenuItem>
+										{/* <DropdownMenuItem>
 											<Settings className="mr-2 h-4 w-4" />
 											Folder Settings
-										</DropdownMenuItem>
+										</DropdownMenuItem> */}
 										<DropdownMenuItem>
-											Rename Folder
+											Edit Folder
 										</DropdownMenuItem>
 										<DropdownMenuItem className="text-red-600">
 											Delete Folder
@@ -197,7 +207,6 @@ export default function FolderPage() {
 					</CardHeader>
 				</Card>
 
-				{/* Collaborators */}
 				{
 					folderData?.isShared &&
 
@@ -253,7 +262,9 @@ export default function FolderPage() {
 						</div>
 					</CardContent>
 				</Card>
+				<UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
 			</div>
+
 			{mediaViewerOpen &&
 
 				<MediaViewer
@@ -264,6 +275,10 @@ export default function FolderPage() {
 					onIndexChange={setCurrentMediaIndex}
 				/>
 			}
+
+
+
+
 		</DashboardLayout>
 	);
 }
