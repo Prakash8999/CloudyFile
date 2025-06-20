@@ -19,6 +19,7 @@ import { useAuth } from '@/hooks/AuthProvider';
 interface UploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  folderUuid?: string
 }
 
 
@@ -27,18 +28,21 @@ interface UploadModalProps {
 
 
 
-export default function UploadModal({ open, onOpenChange }: UploadModalProps) {
+export default function UploadModal({ open, onOpenChange, folderUuid }: UploadModalProps) {
   const [activeTab, setActiveTab] = useState('all');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const { token } = useAuth()
   const [controller, setController] = useState<AbortController | null>(null);
-  const {setDataPost, dataPost} = useAuth()
+  const { setDataPost, dataPost, triggerUploadEvent } = useAuth()
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(prev => [...prev, ...acceptedFiles]);
   }, []);
+
+
+  console.log("folder Uuid", folderUuid)
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -142,20 +146,26 @@ export default function UploadModal({ open, onOpenChange }: UploadModalProps) {
       const confrimUpload = await axios.post(`${BASE_URL}/file/upload/confirm`, {
         success: true,
         fileId: getUrl.data?.data.fileId,
+        folderUuid: folderUuid
       }, {
         headers: {
           'Content-Type': 'application/json',
           "x-auth-token": `Bearer ${token}`
         }
       })
-      console.log( "confrimUpload " , confrimUpload)
+      console.log("confrimUpload ", confrimUpload)
 
 
       setIsUploading(false);
+      if ( folderUuid){
+        
+        			triggerUploadEvent('folder')
+        
+      }
       toast.success(`${files.length} files uploaded successfully`);
       setFiles([]);
       onOpenChange(false);
-    } catch (error:any) {
+    } catch (error: any) {
       if (axios.isCancel(error)) {
         toast.error('Upload Cancelled');
         console.log("Cancelled:", error.message);

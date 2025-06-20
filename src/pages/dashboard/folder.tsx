@@ -12,11 +12,12 @@ import {
 	MoreVertical,
 	UserPlus,
 	Folder as FolderIcon,
-	Loader
+	Loader,
+	Edit2
 } from 'lucide-react';
 import FileCard from '@/components/dashboard/FileCard';
 import MediaViewer from '@/components/viewers/MediaViewer';
-import DocumentViewer from '@/components/viewers/DocumentViewer';
+// import DocumentViewer from '@/components/viewers/DocumentViewer';
 import { useState } from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useFolderDataSingle } from '@/hooks/useFolder';
@@ -25,15 +26,18 @@ import axios from 'axios';
 import { BASE_URL } from '@/components/common/BaseUrl';
 import { useAuth } from '@/hooks/AuthProvider';
 import UploadModal from '@/components/common/UploadModal';
+import EditFolderModal from '@/components/common/EditFolderModal';
 
 export default function FolderPage() {
 	const { uuid } = useParams();
 	const navigate = useNavigate();
 	const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
-	const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
+	// const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
 	const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-	const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
+	// const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
 	const [uploadModalOpen, setUploadModalOpen] = useState(false);
+	const [createFolderModalOpen, setCreateFolderModalOpen] = useState(false);
+
 	const { token } = useAuth()
 
 	if (!uuid) {
@@ -76,8 +80,7 @@ export default function FolderPage() {
 
 
 
-		if (file.fileType === 'image' || file.fileType === 'video') {
-			const mediaIndex = mediaFiles.findIndex(media => media.id === file.id);
+		if (file.fileType === 'image' || file.fileType === 'video' || file.fileType === 'audio') {
 			setCurrentMediaIndex(index);
 			setMediaViewerOpen(true);
 		}
@@ -172,16 +175,16 @@ export default function FolderPage() {
 
 							<div className="flex items-center gap-2">
 								<Button variant="outline" size="sm" onClick={() => setUploadModalOpen(true)}>
-									<UploadCloud className="mr-2 h-4 w-4"  />
+									<UploadCloud className="mr-2 h-4 w-4" />
 									Upload
 								</Button>
 								<Button variant="outline" size="sm">
 									<UserPlus className="mr-2 h-4 w-4" />
 									Invite
 								</Button>
-								<Button variant="outline" size="sm">
-									<Share2 className="mr-2 h-4 w-4" />
-									Share
+								<Button variant="outline" size="sm"               onClick={() => setCreateFolderModalOpen(true)}>
+									<Edit2 className="mr-2 h-4 w-4" />
+									Edit
 								</Button>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
@@ -195,7 +198,7 @@ export default function FolderPage() {
 											Folder Settings
 										</DropdownMenuItem> */}
 										<DropdownMenuItem>
-											Edit Folder
+											Share Folder
 										</DropdownMenuItem>
 										<DropdownMenuItem className="text-red-600">
 											Delete Folder
@@ -262,7 +265,13 @@ export default function FolderPage() {
 						</div>
 					</CardContent>
 				</Card>
-				<UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
+				<UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} folderUuid={folderData.uuid} />
+
+				<EditFolderModal
+					open={createFolderModalOpen}
+					onOpenChange={setCreateFolderModalOpen}
+					folderData={folderData}
+				/>
 			</div>
 
 			{mediaViewerOpen &&

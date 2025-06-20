@@ -118,7 +118,7 @@ export const useDeleteFile = () => {
   const [loadingId, setLoadingId] = useState<number | null>(null);
 
 
-  const updateStatus = async (key_name:string, status: boolean, fileId: number) => {
+  const updateStatus = async (key_name: string, status: boolean, fileId: number) => {
     try {
       setLoadingId(fileId)
       await axios.patch(
@@ -149,15 +149,15 @@ const toQueryString = (params: Record<string, any>): string => {
     .join("&");
 };
 
-export const useFileDataGeneric = (filters: Record<string, any>, fetch : boolean) => {
+export const useFileDataGeneric = (filters: Record<string, any>, fetch: boolean) => {
   const [data, setData] = useState<FileAttributes[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { token, dataPost } = useAuth();
-  
+
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        if (!fetch ) return;
+        if (!fetch) return;
         setLoading(true);
         const queryString = toQueryString(filters);
         console.log(" filters", queryString);
@@ -173,7 +173,46 @@ export const useFileDataGeneric = (filters: Record<string, any>, fetch : boolean
     };
 
     fetchFiles();
-  }, [JSON.stringify(filters), token, dataPost.file,fetch]); // serialize filters for dependency tracking
+  }, [JSON.stringify(filters), token, dataPost.file, fetch]); // serialize filters for dependency tracking
 
   return { data, loading };
 };
+
+
+
+
+
+
+export const useFileDataLatest = (rawStart?: string, rawEnd?: string) => {
+  const [data, setData] = useState<FileAttributes[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { token, dataPost } = useAuth();
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        setLoading(true);
+        const params: any = { isArchived: false };
+        if (rawStart && rawEnd) {
+          params.rawStart = rawStart;
+          params.rawEnd = rawEnd;
+        }
+        const response = await axios.get(`${BASE_URL}/file/read-latest`, {
+          headers: { "x-auth-token": `Bearer ${token}` },
+          params: params,
+        });
+        setData(response.data.data);
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to fetch file data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // fetchFiles();
+      fetchFiles();
+    
+    }, [token, dataPost.file, rawStart, rawEnd]);
+
+  return { data, loading };
+}

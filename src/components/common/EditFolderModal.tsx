@@ -9,7 +9,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +28,6 @@ import {
 import { toast } from 'sonner';
 import { useFileDataGeneric } from '@/hooks/useFileData';
 import { formatFileSize } from '@/lib/utils';
-import { FileAttributes } from '@/types/FileAttributes';
 import axios from 'axios';
 import { BASE_URL } from './BaseUrl';
 import { useAuth } from '@/hooks/AuthProvider';
@@ -38,7 +36,7 @@ import { FolderAttibutes } from '@/types/Folder';
 interface CreateFolderModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	folderData?:FolderAttibutes 
+	folderData?: FolderAttibutes
 }
 
 
@@ -52,14 +50,20 @@ interface Collaborator {
 
 
 
-export default function CreateFolderModal({ open, onOpenChange,folderData }: CreateFolderModalProps) {
-	const [folderName, setFolderName] = useState(folderData?.name || '');
+export default function EditFolderModal({ open, onOpenChange, folderData }: CreateFolderModalProps) {
+	const [folderName, setFolderName] = useState(folderData?.name);
 	const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 	const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
 	const [newCollaboratorEmail, setNewCollaboratorEmail] = useState('');
 	const [isCreating, setIsCreating] = useState(false);
-	
-	const { data: availableFiles } = useFileDataGeneric({ "isDeleted": false, "isArchived": false }, open)
+	const { data: availableFiles } = useFileDataGeneric({ "isDeleted": false, "isArchived": false ,fileIds: folderData?.files.map(file => file.id) }, open)
+	useEffect(() => {
+		if (folderData?.files) {
+			const initialFileIds = folderData.files.map(file => file.id.toString());
+			setSelectedFiles(initialFileIds);
+		}
+	}, [folderData, open]);
+
 	const { token } = useAuth()
 	console.log("open ", open);
 	const getFileIcon = (type: string) => {
@@ -117,15 +121,18 @@ export default function CreateFolderModal({ open, onOpenChange,folderData }: Cre
 
 	const { triggerUploadEvent } = useAuth()
 
+
+
 	const handleCreateFolder = async () => {
-		if (!folderName.trim()) {
+		if (folderName && !folderName.trim()) {
 			toast.error('Please enter a folder name');
 			return;
 		}
 
 		setIsCreating(true);
-		try {
-			const insertResponse = await axios.post(`${BASE_URL}/folder/insert`, {
+		try {	
+			const insertResponse = await axios.patch(`${BASE_URL}/folder/update`, {
+				uuid: folderData?.uuid,
 				name: folderName,
 				fileIds: selectedFiles.map(Number),
 
@@ -136,7 +143,7 @@ export default function CreateFolderModal({ open, onOpenChange,folderData }: Cre
 				}
 			})
 			setIsCreating(false);
-			toast.success(`Folder "${folderName}" created successfully ${selectedFiles && selectedFiles.length > 0 ? "with " + selectedFiles.length + " files." : "."}   `);
+			toast.success(`Folder "${folderName}" updated successfully ${selectedFiles && selectedFiles.length > 0 ? "with " + selectedFiles.length + " files." : "."}   `);
 			setFolderName('');
 			triggerUploadEvent('folder')
 			console.log("insert Response", insertResponse);
@@ -163,11 +170,12 @@ export default function CreateFolderModal({ open, onOpenChange,folderData }: Cre
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
 						<FolderPlus className="h-5 w-5" />
-						Create New Folder
+						Edit Folder
 					</DialogTitle>
 					<DialogDescription>
-						Create a new folder, add files, and invite collaborators to work together.
+						Edit the folder’s details, manage files, and update collaborators.
 					</DialogDescription>
+
 				</DialogHeader>
 
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
@@ -320,9 +328,9 @@ export default function CreateFolderModal({ open, onOpenChange,folderData }: Cre
 						</Button>
 						<Button
 							onClick={handleCreateFolder}
-							disabled={isCreating || !folderName.trim()}
+							disabled={isCreating || !folderName || !folderName.trim()}
 						>
-							{isCreating ? 'Creating...' : 'Create Folder'}
+							{isCreating ? 'Editing...' : 'Edit Folder'}
 						</Button>
 					</div>
 				</div>
