@@ -59,11 +59,11 @@ export default function Hero() {
             <div className="flex flex-wrap gap-4 md:gap-8">
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-green-500" />
-                <span className="text-sm">AES-256 Encryption</span>
+                <span className="text-sm">Secure File Storage</span>
               </div>
               <div className="flex items-center gap-2">
                 <Zap className="h-5 w-5 text-amber-500" />
-                <span className="text-sm">Lightning-fast Uploads</span>
+                <span className="text-sm">Fast Uploads</span>
               </div>
               <div className="flex items-center gap-2">
                 <Cloud className="h-5 w-5 text-blue-500" />

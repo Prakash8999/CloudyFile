@@ -174,10 +174,10 @@ export default function FileCard({ fileId, type, title, thumbnail, isFavorite, o
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+            className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
           >
-            <ExternalLink className="h-4 w-4"
-              onClick={handleCardClick}
+            <Share2 className="h-4 w-4"
+              // onClick={handleCardClick}
 
             />
           </Button>

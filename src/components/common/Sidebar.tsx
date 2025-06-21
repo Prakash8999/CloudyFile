@@ -12,7 +12,8 @@ import {
   Settings, 
   User,
   FileAudioIcon,
-  Music
+  Music,
+  Share
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -28,9 +29,10 @@ export default function Sidebar() {
     { name: 'Photo Gallery', href: '/dashboard/photos', icon: ImageIcon, new: false },
     { name: 'Documents', href: '/dashboard/documents', icon: FileText, new: true },
     { name: 'Audios', href: '/dashboard/audios', icon: Music, new: true },
-    { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart2, new: false },
+    { name: 'Shared', href: '/dashboard/shared', icon: Share, new: false },
     { name: 'Favorites', href: '/dashboard/favorites', icon: Star, new: false },
     { name: 'Archive', href: '/dashboard/archive', icon: Archive, new: false },
+    { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart2, new: false },
     { name: 'Recycle', href: '/dashboard/recycle', icon: Trash2, new: false },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings, new: false },
     { name: 'Profile', href: '/dashboard/profile', icon: User, new: false },
