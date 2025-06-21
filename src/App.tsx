@@ -11,6 +11,8 @@ import Recycle from '@/pages/dashboard/recycle';
 import Settings from '@/pages/dashboard/settings';
 import Profile from '@/pages/dashboard/profile';
 import Landing from '@/pages/landing';
+import Shared from '@/pages/dashboard/shared';
+
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -31,6 +33,7 @@ function App() {
             <Route path="/dashboard/photos" element={<Photos />} />
             <Route path="/dashboard/documents" element={<Documents />} />
             <Route path="/dashboard/audios" element={<Audios />} />
+            <Route path="/dashboard/shared" element={<Shared />} />
             <Route path="/dashboard/analytics" element={<Analytics />} />
             <Route path="/dashboard/favorites" element={<Favorites />} />
             <Route path="/dashboard/archive" element={<Archive />} />

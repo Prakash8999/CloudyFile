@@ -11,12 +11,9 @@ import {
   Trash2, 
   Settings, 
   User,
-  FileAudioIcon,
   Music,
-  Share
+  Share2
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 
@@ -29,7 +26,7 @@ export default function Sidebar() {
     { name: 'Photo Gallery', href: '/dashboard/photos', icon: ImageIcon, new: false },
     { name: 'Documents', href: '/dashboard/documents', icon: FileText, new: true },
     { name: 'Audios', href: '/dashboard/audios', icon: Music, new: true },
-    { name: 'Shared', href: '/dashboard/shared', icon: Share, new: false },
+    { name: 'Shared with Me', href: '/dashboard/shared', icon: Share2, new: false },
     { name: 'Favorites', href: '/dashboard/favorites', icon: Star, new: false },
     { name: 'Archive', href: '/dashboard/archive', icon: Archive, new: false },
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart2, new: false },
