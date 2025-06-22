@@ -70,7 +70,9 @@ const triggerUploadEvent = (type: keyof UploadEvents) => {
   const currentPath = location.pathname;
 
   useEffect(() => {
-    if (!token) {
+          const isPublicView = currentPath.startsWith("/view-file/");
+
+    if (!token && !isPublicView) {
       if (currentPath !== '/') navigate('/');
       return;
     }
@@ -139,14 +141,17 @@ const triggerUploadEvent = (type: keyof UploadEvents) => {
 
 
   useEffect(() => {
-    if (tokenError && currentPath !== '/') {
+      const isPublicView = currentPath.startsWith("/view-file/");
+      console.log("is PublicView", isPublicView)
+    if (tokenError && !isPublicView && currentPath !== '/' ) {
 
       localStorage.removeItem('token')
       navigate('/')
       toast.error("Please relogin")
     }
-  }, [tokenError])
+  }, [tokenError, currentPath])
 
+  
 
   return (
     <AuthContext.Provider value={{ token, user, setUser, setToken , dataPost, setDataPost, uploadEvents, triggerUploadEvent}}>

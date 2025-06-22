@@ -7,6 +7,7 @@ import { BASE_URL } from '../common/BaseUrl';
 import { useAuth } from '@/hooks/AuthProvider';
 import { toast } from 'sonner';
 import { useDeleteFile } from '@/hooks/useFileData';
+import ShareModal from '../common/ShareModal';
 
 interface FileCardProps {
   fileId: number;
@@ -21,6 +22,8 @@ interface FileCardProps {
 
 export default function FileCard({ fileId, type, title, thumbnail, isFavorite, onClick, newLoading = false }: FileCardProps) {
   const [favorite, setFavorite] = useState(isFavorite);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const handleCardClick = () => {
     if (onClick) {
@@ -37,6 +40,10 @@ export default function FileCard({ fileId, type, title, thumbnail, isFavorite, o
 
 
   // console.log("new loading", newLoading);
+  const handleActionClick = (e: React.MouseEvent, action: () => void) => {
+    e.stopPropagation();
+    action();
+  };
   const handleFavoriteClick = async () => {
     setFavorite(!isFavorite);
 
@@ -53,10 +60,12 @@ export default function FileCard({ fileId, type, title, thumbnail, isFavorite, o
       toast.error("Error adding file to favorites");
     }
   }
-  
+
   const { updateStatus } = useDeleteFile();
 
-
+ const handleShareClick = () => {
+    setShareModalOpen(true);
+  };
   return (
     <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-200 hover:shadow-md hover:bg-white/90 dark:hover:bg-gray-900/90 h-full"
 
@@ -175,14 +184,24 @@ export default function FileCard({ fileId, type, title, thumbnail, isFavorite, o
             size="icon"
             variant="ghost"
             className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
+              onClick={handleShareClick }
+
           >
             <Share2 className="h-4 w-4"
-              // onClick={handleCardClick}
+            // onClick={handleCardClick}
 
             />
           </Button>
         </div>
       </CardContent>
+       <ShareModal
+       token={token}
+       fileId={fileId}
+        open={shareModalOpen}
+        onOpenChange={setShareModalOpen}
+        fileName={title}
+        fileType={type}
+      />
     </Card>
   );
 }

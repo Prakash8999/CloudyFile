@@ -12,6 +12,7 @@ import Settings from '@/pages/dashboard/settings';
 import Profile from '@/pages/dashboard/profile';
 import Landing from '@/pages/landing';
 import Shared from '@/pages/dashboard/shared';
+import PublicLink from '@/pages/dashboard/viewPublicFile';
 
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from '@/components/theme/theme-provider';
@@ -41,6 +42,9 @@ function App() {
             <Route path="/dashboard/settings" element={<Settings />} />
             <Route path="/dashboard/profile" element={<Profile />} />
             <Route path="/dashboard/folder/:uuid" element={<FolderPage />} />
+            <Route path="/dashboard/folder/:uuid" element={<FolderPage />} />
+            <Route path="/view-file/:fileId" element={<PublicLink />} />
+
 
           </Routes>
         </AuthProvider>
