@@ -17,10 +17,11 @@ interface FileCardProps {
   isFavorite?: boolean;
   newLoading?: boolean,
   onClick?: () => void;
+  shared?: boolean;
 
 }
 
-export default function FileCard({ fileId, type, title, thumbnail, isFavorite, onClick, newLoading = false }: FileCardProps) {
+export default function FileCard({ fileId, type, title, thumbnail, isFavorite, onClick, newLoading = false, shared = false }: FileCardProps) {
   const [favorite, setFavorite] = useState(isFavorite);
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
@@ -142,8 +143,8 @@ export default function FileCard({ fileId, type, title, thumbnail, isFavorite, o
 
 
       </div>
-
-      <CardContent className="p-4">
+      {
+        !shared ? <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-medium truncate w-fit" title={title}>
@@ -193,7 +194,61 @@ export default function FileCard({ fileId, type, title, thumbnail, isFavorite, o
             />
           </Button>
         </div>
+      </CardContent> : <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-medium truncate w-fit" title={title}>
+              {/* {
+                title.length < 10 ? title : title.slice(0, 9) + '...'
+              } */}
+              {title}
+            </h3>
+          </div>
+
+          {/* <div className=" flex gap-x-4">
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
+              onClick={handleFavoriteClick}
+            >
+              <Heart className={`h-4 w-4 ${favorite ? 'fill-red-500 text-red-500' : ''}`} />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
+              onClick={() => updateStatus("isArchived", true, fileId)}
+            >
+              <ArchiveIcon className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
+              onClick={() => updateStatus("isDeleted", true, fileId)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm border-white/30 text-white"
+              onClick={handleShareClick }
+
+          >
+            <Share2 className="h-4 w-4"
+            // onClick={handleCardClick}
+
+            />
+          </Button> */}
+        </div>
       </CardContent>
+      }
+
+      
        <ShareModal
        token={token}
        fileId={fileId}

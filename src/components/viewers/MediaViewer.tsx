@@ -20,6 +20,7 @@ interface MediaViewerProps {
   files: FileAttributes[];
   currentIndex: number;
   // fileId : number;
+  shared?: boolean;
   onIndexChange: (index: number) => void;
 }
 
@@ -27,8 +28,10 @@ export default function MediaViewer({
   open,
   onOpenChange,
   files,
+
   currentIndex,
   // fileId,
+  shared,
   onIndexChange
 }: MediaViewerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -37,7 +40,7 @@ export default function MediaViewer({
   console.log("currentFile", currentFile);
 
 console.log("current file url", currentFile);
-  const { data: urlData, loading } = useFileDataById(currentFile.id, open)
+  const { data: urlData, loading } = useFileDataById(currentFile.id, open, shared)
   console.log("urlData ", urlData);
 
 

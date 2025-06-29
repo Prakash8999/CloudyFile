@@ -9,35 +9,35 @@ import { toast } from "sonner";
 
 
 
-export const useFileData = (fileType: string) => {
-  const [data, setData] = useState<FileAttributes[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const { token, dataPost } = useAuth();
+  export const useFileData = (fileType: string) => {
+    const [data, setData] = useState<FileAttributes[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const { token, dataPost } = useAuth();
 
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${BASE_URL}/file/read?fileType=${fileType}&isArchived=${false}`, {
-          headers: { "x-auth-token": `Bearer ${token}` },
-        });
-        setData(response.data.data);
-      } catch (error: any) {
-        toast.error(error.response?.data?.message || "Failed to fetch file data");
-      } finally {
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+      const fetchFiles = async () => {
+        try {
+          setLoading(true);
+          const response = await axios.get(`${BASE_URL}/file/read?fileType=${fileType}&isArchived=${false}`, {
+            headers: { "x-auth-token": `Bearer ${token}` },
+          });
+          setData(response.data.data);
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Failed to fetch file data");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchFiles();
-  }, [fileType, token, dataPost.file]);
+      fetchFiles();
+    }, [fileType, token, dataPost.file]);
 
-  return { data, loading };
-}
+    return { data, loading };
+  }
 
 
 
-export const useFileDataById = (id: number, enabled = true) => {
+export const useFileDataById = (id: number, enabled = true, shared =false) => {
 
   const [data, setData] = useState();
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,7 +49,14 @@ export const useFileDataById = (id: number, enabled = true) => {
     const fetchFiles = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/file/read/${id}`, {
+           const url = shared
+          ? `${BASE_URL}/share-file/get-shared-files-url/${id}`
+          : `${BASE_URL}/file/read/${id}`;
+
+      
+
+
+        const response = await axios.get(url, {
           headers: { "x-auth-token": `Bearer ${token}` },
         });
         setData(response.data.data);
@@ -61,7 +68,7 @@ export const useFileDataById = (id: number, enabled = true) => {
     };
 
     fetchFiles();
-  }, [id, token]);
+  }, [id, token, shared]);
 
   return { data, loading, enabled };
 

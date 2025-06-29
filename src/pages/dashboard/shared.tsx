@@ -10,6 +10,12 @@ import MediaViewer from '@/components/viewers/MediaViewer';
 import DocumentViewer from '@/components/viewers/DocumentViewer';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { BASE_URL } from '@/components/common/BaseUrl';
+import { useSharedFiles } from '@/hooks/useShareFileData';
+import { dateFormat } from '@/lib/utils';
+import { useAuth } from '@/hooks/AuthProvider';
+import { Button } from '@/components/ui/button';
 
 export default function Shared() {
   const navigate = useNavigate();
@@ -17,6 +23,7 @@ export default function Shared() {
   const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
+  const { token } = useAuth()
 
   // Mock shared folders data
   const sharedFolders = [
@@ -196,17 +203,48 @@ export default function Shared() {
     url: file.url || '/documents/default.pdf'
   }));
 
-  const handleFileClick = (file: any) => {
-    if (file.type === 'document') {
-      const docIndex = documentFiles.findIndex(doc => doc.id === file.id);
-      setCurrentDocumentIndex(docIndex);
-      setDocumentViewerOpen(true);
-    } else if (file.type === 'image' || file.type === 'video') {
-      const mediaIndex = mediaFiles.findIndex(media => media.id === file.id);
-      setCurrentMediaIndex(mediaIndex);
+
+  const openUrl = async (fileId: number) => {
+    // event.preventDefault(); // Stop default anchor behavior
+
+    try {
+      const url = await getFileUrlById(fileId);
+      window.open(url, '_blank'); // Open the signed URL in a new tab
+    } catch (err) {
+      console.error('Failed to fetch file URL:', err);
+    }
+  };
+
+  const handleFileClick = (file: any, index: number) => {
+
+    if (file.fileType === 'application' || file.fileType === 'document') {
+      openUrl(file.id)
+      return
+    }
+    console.log(file)
+    if (file.fileType === 'image' || file.fileType === 'video' || file.fileType === 'audio') {
+      setCurrentMediaIndex(index);
       setMediaViewerOpen(true);
     }
   };
+
+
+
+
+  const getFileUrlById = async (fileId: number): Promise<string> => {
+
+    const response = await axios.get(`${BASE_URL}/share-file/get-shared-files-url/${fileId}`, {
+      headers: { "x-auth-token": `Bearer ${token}` },
+    });
+    const fileUrl = response.data?.data
+    return fileUrl;
+  };
+
+
+
+
+
+
 
   const handleFolderClick = (folderId: string) => {
     navigate(`/dashboard/folder/${folderId}`);
@@ -237,6 +275,37 @@ export default function Shared() {
         return 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
     }
   };
+  const getThumbnail = (fileType: string) => {
+    if (fileType === 'image') {
+      return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/picture_12236741.png"
+    }
+    if (fileType === 'video') {
+      return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/5617bgr.jpg"
+    }
+
+  }
+
+
+
+
+
+
+  const {
+    files,
+    meta,
+    loading,
+    error,
+    setFilters,
+    filters,
+    refetch,
+  } = useSharedFiles({
+    page: 1,
+    limit: 10,
+    sort_by: "createdAt",
+    sort_order: "DESC",
+  });
+  console.log(files)
+
 
   return (
     <DashboardLayout title="Shared with Me">
@@ -261,7 +330,7 @@ export default function Shared() {
               <TabsList className="mb-6">
                 <TabsTrigger value="all">All Shared</TabsTrigger>
                 <TabsTrigger value="folders">Folders ({sharedFolders.length})</TabsTrigger>
-                <TabsTrigger value="files">Files ({sharedFiles.length})</TabsTrigger>
+                <TabsTrigger value="files">Files ({files.length})</TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="space-y-8">
@@ -272,8 +341,8 @@ export default function Shared() {
                       <Users className="h-5 w-5 text-muted-foreground" />
                       <h3 className="text-lg font-medium">Shared Folders</h3>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                      {sharedFolders.map((folder) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 font-bold text-red-500">
+                      {/* {sharedFolders.map((folder) => (
                         <div key={folder.id} className="relative">
                           <FolderCard
                             id={folder.id}
@@ -302,28 +371,32 @@ export default function Shared() {
                             <span>{folder.sharedDate}</span>
                           </div>
                         </div>
-                      ))}
+                      ))} */}
+
+                      Folder section is yet to be implemented
                     </div>
                   </div>
                 )}
 
                 {/* Shared Files */}
-                {sharedFiles.length > 0 && (
+                {files.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <Share2 className="h-5 w-5 text-muted-foreground" />
                       <h3 className="text-lg font-medium">Shared Files</h3>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {sharedFiles.map((file) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 pb-4 ">
+                      {files.map((file, index) => (
                         <div key={file.id} className="relative">
                           <FileCard
-                            type={file.type as 'audio' | 'document' | 'image' | 'video'}
-                            title={file.title}
-							key={1}
-                            thumbnail={file.thumbnail}
-                            isFavorite={file.isFavorite}
-                            onClick={() => handleFileClick(file)}
+                            fileId={file.FileAttribute.id}
+                            key={file.id}
+                            type={file.FileAttribute.fileType as 'audio' | 'application' | 'image' | 'video'}
+                            title={file.FileAttribute.fileName}
+                            shared={true}
+                            thumbnail={file.FileAttribute.thumbnailUrl ? file.FileAttribute.thumbnailUrl : getThumbnail(file.FileAttribute.fileType)}
+                            isFavorite={false}
+                            onClick={() => handleFileClick(file.FileAttribute, index)}
                           />
                           <div className="absolute top-2 right-2 flex items-center gap-1">
                             <Badge variant="outline" className={`text-xs ${getRoleColor(file.role)}`}>
@@ -333,25 +406,43 @@ export default function Shared() {
                           </div>
                           <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
                             <Avatar className="h-4 w-4">
-                              <AvatarImage src={file.sharedBy.avatar} />
+                              <AvatarImage src={file.owner.profileUrl} />
                               <AvatarFallback className="text-xs">
-                                {file.sharedBy.name.charAt(0)}
+                                {file.owner.fullName.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
-                            <span>Shared by {file.sharedBy.name}</span>
+                            <span>Shared by {file.owner.fullName}</span>
                             <Clock className="h-3 w-3" />
-                            <span>{file.sharedDate}</span>
+                            <span>{dateFormat(file.createdAt)}</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
+
+
+                <div className="flex gap-4 mt-4 justify-center">
+                  <Button
+                    disabled={filters.page === 1}
+                    variant={'ghost'}
+                    onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant={'ghost'}
+                    disabled={meta! && filters.page === meta.total_pages}
+                    onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+                  >
+                    Next
+                  </Button>
+                </div>
               </TabsContent>
 
               <TabsContent value="folders">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {sharedFolders.map((folder) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-bold text-red-500">
+                  {/* {sharedFolders.map((folder) => (
                     <div key={folder.id} className="relative">
                       <FolderCard
                         id={folder.id}
@@ -380,20 +471,29 @@ export default function Shared() {
                         <span>{folder.sharedDate}</span>
                       </div>
                     </div>
-                  ))}
+                  ))} */}
+                  <h1>
+
+
+                    Folder section is yet to be implemented
+                  </h1>
+
                 </div>
               </TabsContent>
 
               <TabsContent value="files">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {sharedFiles.map((file) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 pb-4">
+                  {files.map((file, index) => (
                     <div key={file.id} className="relative">
                       <FileCard
-                        type={file.type as 'audio' | 'document' | 'image' | 'video'}
-                        title={file.title}
-                        thumbnail={file.thumbnail}
-                        isFavorite={file.isFavorite}
-                        onClick={() => handleFileClick(file)}
+                        fileId={file.FileAttribute.id}
+                        key={file.id}
+                        type={file.FileAttribute.fileType as 'audio' | 'application' | 'image' | 'video'}
+                        title={file.FileAttribute.fileName}
+                        shared={true}
+                        thumbnail={file.FileAttribute.thumbnailUrl ? file.FileAttribute.thumbnailUrl : getThumbnail(file.FileAttribute.fileType)}
+                        isFavorite={false}
+                        onClick={() => handleFileClick(file.FileAttribute, index)}
                       />
                       <div className="absolute top-2 right-2 flex items-center gap-1">
                         <Badge variant="outline" className={`text-xs ${getRoleColor(file.role)}`}>
@@ -403,17 +503,34 @@ export default function Shared() {
                       </div>
                       <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
                         <Avatar className="h-4 w-4">
-                          <AvatarImage src={file.sharedBy.avatar} />
+                          <AvatarImage src={file.owner.profileUrl} />
                           <AvatarFallback className="text-xs">
-                            {file.sharedBy.name.charAt(0)}
+                            {file.owner.fullName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        <span>Shared by {file.sharedBy.name}</span>
+                        <span>Shared by {file.owner.fullName}</span>
                         <Clock className="h-3 w-3" />
-                        <span>{file.sharedDate}</span>
+                        <span>{dateFormat(file.createdAt)}</span>
                       </div>
                     </div>
                   ))}
+
+                </div>
+                <div className="flex gap-4 mt-4 justify-center">
+                  <Button
+                    disabled={filters.page === 1}
+                    variant={'ghost'}
+                    onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant={'ghost'}
+                    disabled={meta! && filters.page === meta.total_pages}
+                    onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+                  >
+                    Next
+                  </Button>
                 </div>
               </TabsContent>
             </Tabs>
@@ -422,22 +539,27 @@ export default function Shared() {
       </div>
 
       {/* Media Viewer */}
-      <MediaViewer
-        open={mediaViewerOpen}
-        onOpenChange={setMediaViewerOpen}
-        files={mediaFiles}
-        currentIndex={currentMediaIndex}
-        onIndexChange={setCurrentMediaIndex}
-      />
+
+      {mediaViewerOpen &&
+
+        <MediaViewer
+          open={mediaViewerOpen}
+          onOpenChange={setMediaViewerOpen}
+          files={files.map(data => data.FileAttribute) || []}
+          currentIndex={currentMediaIndex}
+          onIndexChange={setCurrentMediaIndex}
+          shared={true}
+        />
+      }
 
       {/* Document Viewer */}
-      <DocumentViewer
+      {/* <DocumentViewer
         open={documentViewerOpen}
         onOpenChange={setDocumentViewerOpen}
         files={documentFiles}
         currentIndex={currentDocumentIndex}
         onIndexChange={setCurrentDocumentIndex}
-      />
+      /> */}
     </DashboardLayout>
   );
-}
+}   

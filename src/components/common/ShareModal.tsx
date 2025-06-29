@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,8 +16,8 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { 
-  UserPlus, 
+import {
+  UserPlus,
   X,
   Copy,
   Link,
@@ -36,8 +36,8 @@ import { BASE_URL } from './BaseUrl';
 interface ShareModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  token:string,
-  fileId :number,
+  token: string,
+  fileId: number,
   fileName: string;
   fileType: string;
 }
@@ -46,31 +46,19 @@ interface Collaborator {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
-  role: 'read' | 'write' | 'admin';
+  avatar: string;
+  role: 'Reader' | 'Editor';
 }
 
-export default function ShareModal({ open, onOpenChange, fileName, fileType,token, fileId }: ShareModalProps) {
+export default function ShareModal({ open, onOpenChange, fileName, fileType, token, fileId }: ShareModalProps) {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([
-    {
-      id: '1',
-      name: 'Sarah Wilson',
-      email: 'sarah@company.com',
-      avatar: 'https://github.com/shadcn.png',
-      role: 'write'
-    },
-    {
-      id: '2',
-      name: 'Mike Johnson',
-      email: 'mike@company.com',
-      avatar: 'https://github.com/shadcn.png',
-      role: 'read'
-    }
+
   ]);
-  
+
   const [newCollaboratorEmail, setNewCollaboratorEmail] = useState('');
   const [shareLink, setShareLink] = useState('');
-  const [ loading, setLoading ] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [existingClbtrNumber, setExistingClbtrNumber] = useState(0);
   const [expireDate, setExpireDate] = useState<string>();
   const [linkGenerated, setLinkGenerated] = useState(false);
   const [linkSettings, setLinkSettings] = useState({
@@ -81,7 +69,54 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
   });
   const [password, setPassword] = useState('');
 
-  const addCollaborator = () => {
+
+
+
+
+  const fetchCollaborator = async () => {
+    try {
+      const getCollaborators = await axios.get(`${BASE_URL}/share-file/get-collaborators/${fileId}`, {
+        headers: { "x-auth-token": `Bearer ${token}` },
+      })
+
+
+      console.log(getCollaborators.data.data)
+      const collaborators = getCollaborators?.data?.data?.map((collaborator: any) => ({
+
+        id: collaborator.sharedWithUser.id,
+        name: collaborator.sharedWithUser.fullName,
+        email: collaborator.sharedWithUser.email,
+        avatar: collaborator.sharedWithUser.profileUrl,
+        role: collaborator.role
+
+      }))
+      setCollaborators(collaborators);
+      console.log(collaborators)
+      if (collaborators.length > 0) {
+        setExistingClbtrNumber(collaborators.length)
+      }
+
+
+    } catch (error) {
+      console.error(error);
+      toast.error('Error fetching collaborators!');
+
+    }
+  }
+
+
+  useEffect(() => {
+    if (open) {
+      fetchCollaborator()
+    }
+  }, [open])
+
+
+
+
+
+
+  const addCollaborator = async () => {
     if (!newCollaboratorEmail) {
       toast.error('Please enter an email address');
       return;
@@ -93,33 +128,58 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
       return;
     }
 
-    const newCollaborator: Collaborator = {
-      id: Date.now().toString(),
-      name: newCollaboratorEmail.split('@')[0],
-      email: newCollaboratorEmail,
-      role: 'read'
-    };
 
-    setCollaborators(prev => [...prev, newCollaborator]);
-    setNewCollaboratorEmail('');
-    toast.success('Collaborator added successfully');
+    try {
+      const ifUserExist = await axios.get(`${BASE_URL}/user/read-clbrtr?email=${newCollaboratorEmail}`, {
+        headers: { "x-auth-token": `Bearer ${token}` },
+      })
+
+      console.log(ifUserExist)
+
+      const newCollaborator: Collaborator = {
+        id: ifUserExist.data.data.id,
+        name: ifUserExist.data?.data?.fullName,
+        email: newCollaboratorEmail,
+        role: 'Reader',
+        avatar: ifUserExist.data.data.profileUrl
+      };
+
+      setCollaborators(prev => [...prev, newCollaborator]);
+      setNewCollaboratorEmail('');
+      toast.success('Collaborator added successfully');
+
+    } catch (error: any) {
+      toast.error(error.response.data.message || 'Failed to add collaborator');
+      console.log("error ", error.response.data.message)
+    }
+
+
   };
 
-  const updateCollaboratorRole = (collaboratorId: string, role: 'read' | 'write' | 'admin') => {
-    setCollaborators(prev => 
-      prev.map(collab => 
+  const updateCollaboratorRole = (collaboratorId: string, role: 'Reader' | 'Editor') => {
+    setCollaborators(prev =>
+      prev.map(collab =>
         collab.id === collaboratorId ? { ...collab, role } : collab
       )
     );
     toast.success('Permission updated');
   };
 
+  // const removeCollaborator = (collaboratorId: string) => {
+  //   setCollaborators(prev => prev.filter(collab => collab.id !== collaboratorId));
+  //   toast.success('Collaborator removed');
+  // };
   const removeCollaborator = (collaboratorId: string) => {
-    setCollaborators(prev => prev.filter(collab => collab.id !== collaboratorId));
+    setCollaborators(prev => {
+      const updated = prev.filter(collab => collab.id !== collaboratorId);
+      console.log('After removal:', updated); // Debug line
+      return [...updated]; // Return a *new array* reference
+    });
     toast.success('Collaborator removed');
   };
 
-  const generateShareLink =async () => {
+
+  const generateShareLink = async () => {
     // Generate a mock share link
     try {
       setLoading(true)
@@ -130,21 +190,21 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
       // setShareLink(generatedLink);
       // setLinkGenerated(true);
       const expireDate = new Date(Date.now() + sevenDaysMs).toISOString();
-      const linkResponse =await axios.post(`${BASE_URL}/file/share-link`, {
+      const linkResponse = await axios.post(`${BASE_URL}/file/share-link`, {
         fileId: fileId,
-				expireAt: expireDate,
-        
-			}, {
+        expireAt: expireDate,
+
+      }, {
         headers: {
           'Content-Type': 'application/json',
-					"x-auth-token": `Bearer ${token}`
-				}
-			})
+          "x-auth-token": `Bearer ${token}`
+        }
+      })
 
       if (!linkResponse.data?.data) {
         toast("Failed to generate share link");
       }
-      
+
       console.log("link Response", linkResponse.data);
       const baseUrl = window.location.origin;
       setShareLink(`${baseUrl}/view-file/${fileId}?t=${linkResponse.data.data}`);
@@ -154,7 +214,7 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
     } catch (error) {
       // console.error(error);
       toast.error('Failed to generate share link');
-      
+
     }
 
 
@@ -178,12 +238,12 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'read':
+      case 'Reader':
         return <Eye className="h-3 w-3" />;
-      case 'write':
+      case 'Editor':
         return <Edit className="h-3 w-3" />;
-      case 'admin':
-        return <Shield className="h-3 w-3" />;
+      // case 'admin':
+      //   return <Shield className="h-3 w-3" />;
       default:
         return <Eye className="h-3 w-3" />;
     }
@@ -193,14 +253,88 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
     switch (role) {
       case 'admin':
         return 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800';
-      case 'write':
+      case 'Editor':
         return 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800';
-      case 'read':
+      case 'Reader':
         return 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
       default:
         return 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
     }
   };
+
+  const shareFile = async () => {
+
+
+
+
+
+    if (existingClbtrNumber > 0) {
+      try {
+        setLoading(true)
+        const clbtrData = collaborators.map((data) => ({
+          sharedWithUserId: data.id,
+          sharedWithUserEmail: data.email,
+          role: data.role
+
+        }))
+        const updateData = await axios.patch(`${BASE_URL}/share-file/update-shared-file-data`, {
+          fileId: fileId,
+          collaborators: clbtrData
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            "x-auth-token": `Bearer ${token}`
+
+          }
+        })
+
+        toast.success(updateData.data.message || "File shared data updated successfully");
+        setLoading(false)
+        onOpenChange(false)
+        // toast.success(insertResponse.data.response.data)
+      } catch (error: any) {
+        console.error(error);
+        setLoading(false)
+        toast.error(error.response.data.message || 'Failed to update file shared data')
+
+      }
+
+      return
+    }
+
+    try {
+      setLoading(true)
+      const clbtrData = collaborators.map((data) => ({
+        sharedWithUserId: data.id,
+        sharedWithUserEmail: data.email,
+        role: data.role
+
+      }))
+      const insertResponse = await axios.post(`${BASE_URL}/share-file/insert`, {
+        fileId: fileId,
+        collaborators: clbtrData
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          "x-auth-token": `Bearer ${token}`
+
+        }
+      })
+
+      toast.success(insertResponse.data.message || "File shared successfully.....");
+      setLoading(false)
+      onOpenChange(false)
+      // toast.success(insertResponse.data.response.data)
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false)
+      toast.error(error.response.data.message || 'Failed to share file')
+
+    }
+  }
+
+
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -266,7 +400,7 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
                       <div className="flex items-center gap-2">
                         <Select
                           value={collaborator.role}
-                          onValueChange={(role: 'read' | 'write' | 'admin') => 
+                          onValueChange={(role: 'Reader' | 'Editor') =>
                             updateCollaboratorRole(collaborator.id, role)
                           }
                         >
@@ -274,24 +408,24 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="read">
+                            <SelectItem value="Reader">
                               <div className="flex items-center gap-2">
                                 <Eye className="h-3 w-3" />
                                 Read
                               </div>
                             </SelectItem>
-                            <SelectItem value="write">
+                            <SelectItem value="Editor">
                               <div className="flex items-center gap-2">
                                 <Edit className="h-3 w-3" />
                                 Write
                               </div>
                             </SelectItem>
-                            <SelectItem value="admin">
+                            {/* <SelectItem value="admin">
                               <div className="flex items-center gap-2">
                                 <Shield className="h-3 w-3" />
                                 Admin
                               </div>
-                            </SelectItem>
+                            </SelectItem> */}
                           </SelectContent>
                         </Select>
                         <Button
@@ -320,7 +454,7 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
                   </p>
                 </div>
                 {!linkGenerated ? (
-                  <Button onClick={generateShareLink} disabled ={ loading}>
+                  <Button onClick={generateShareLink} disabled={loading}>
                     <Globe className="mr-2 h-4 w-4" />
                     Generate Link
                   </Button>
@@ -454,10 +588,7 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType,toke
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={() => {
-              // toast.success('Sharing settings saved successfully');
-              onOpenChange(false);
-            }}>
+            <Button onClick={shareFile}>
               Done
             </Button>
           </div>
