@@ -1,3 +1,5 @@
+import { useFileStats } from '@/hooks/useFileData';
+import { FileAttributes } from '@/types/FileAttributes';
 import { clsx, type ClassValue } from 'clsx';
 import dayjs from 'dayjs';
 import { twMerge } from 'tailwind-merge';
@@ -22,7 +24,26 @@ export function formatFileSize(bytes: number): string {
 
 
 
-export function dateFormat (date:string) :string {
+export function dateFormat(date: string): string {
   return dayjs(date).format('MMMM D, YYYY HH:mm')
-
 }
+
+// type FileAttributes = {
+//   fileType: string;
+//   fileSize: number;
+//   // add other props if needed
+// };
+
+export const fileTypeStorage = (files: FileAttributes[], fileType?: string): number => {
+  if (!files || files.length === 0) return 0;
+
+  const filteredFiles = fileType
+    ? files.filter(file => file.fileType === fileType)
+    : files;
+
+  const totalSize = filteredFiles.reduce((total, file) => {
+    return total + file.fileSize;
+  }, 0);
+
+  return totalSize;
+};

@@ -223,3 +223,38 @@ export const useFileDataLatest = (rawStart?: string, rawEnd?: string) => {
 
   return { data, loading };
 }
+
+
+
+
+
+
+
+
+  export const useFileStats = () => {
+    const [data, setData] = useState<FileAttributes[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const { token, dataPost } = useAuth();
+
+    useEffect(() => {
+      const fetchFiles = async () => {
+        try {
+          setLoading(true);
+          const response = await axios.get(`${BASE_URL}/stats`, {
+            headers: { "x-auth-token": `Bearer ${token}` },
+          });
+          setData(response.data.data);
+          console.log(response .data.data);
+        } catch (error: any) {
+          toast.error(error.response?.data?.message || "Failed to fetch file data");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchFiles();
+    }, [ token, dataPost.file]);
+
+    return { data, loading };
+  }
+

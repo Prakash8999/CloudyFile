@@ -7,6 +7,15 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Star, BarChart2, Mail, Github, Twitter, Linkedin, Upload } from 'lucide-react';
 import FileCard from '@/components/dashboard/FileCard';
+import { useFileStats } from '@/hooks/useFileData';
+import { fileTypeStorage, formatFileSize } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
+import LatestSection from '@/components/dashboard/LatestSection';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/AuthProvider';
+
+
+
 
 export default function Profile() {
   const recentFiles = [
@@ -30,7 +39,19 @@ export default function Profile() {
       isFavorite: true
     }
   ];
+  const { user } = useAuth()
 
+  const [avatarUrl, setAvatarUrl] = useState('');
+  useEffect(() => {
+    setAvatarUrl(user && user?.profileUrl ? user?.profileUrl : "https://github.com/shadcn.png")
+
+  }, [user])
+
+  const { data: stats, loading } = useFileStats()
+
+  const favoriteFiles = stats.filter(file => file.isFavorite).length
+  const totalSize = fileTypeStorage(stats)
+  const percetage = (((totalSize / (1024 * 1024)) / 512) * 100).toFixed(2)
   return (
     <DashboardLayout title="Profile">
       <div className="space-y-6">
@@ -39,11 +60,11 @@ export default function Profile() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <Avatar className="h-24 w-24 border-4 border-white dark:border-gray-800 shadow-md">
-                  <AvatarImage src="https://github.com/shadcn.png" alt="John Doe" />
+                    <AvatarImage src={avatarUrl ? avatarUrl : "https://github.com/shadcn.png"} alt="Profile" />
                   <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
                 <div>
-                  <CardTitle className="text-2xl mb-1">John Doe</CardTitle>
+                  <CardTitle className="text-2xl mb-1">{user?.fullName}</CardTitle>
                   <CardDescription className="text-base">Product Designer</CardDescription>
                   <div className="flex items-center gap-2 mt-2">
                     <Badge variant="outline" className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800">
@@ -55,7 +76,7 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              {/* <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="outline">
                   <Mail className="mr-2 h-4 w-4" />
                   Message
@@ -64,10 +85,10 @@ export default function Profile() {
                   <Upload className="mr-2 h-4 w-4" />
                   Change Photo
                 </Button>
-                <Button size="sm">
+                <Button size="sm" >
                   Edit Profile
                 </Button>
-              </div>
+              </div> */}
             </div>
           </CardHeader>
           <CardContent>
@@ -87,37 +108,37 @@ export default function Profile() {
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
-            
+
             <Separator className="my-6" />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex flex-col items-center p-4 bg-white/80 dark:bg-gray-900/80 rounded-lg border border-gray-100 dark:border-gray-800">
                 <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-2">
                   <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <span className="text-2xl font-bold">126</span>
+                <span className="text-2xl font-bold">{stats.length}</span>
                 <span className="text-sm text-muted-foreground">Files</span>
               </div>
-              
+
               <div className="flex flex-col items-center p-4 bg-white/80 dark:bg-gray-900/80 rounded-lg border border-gray-100 dark:border-gray-800">
                 <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-full mb-2">
                   <Star className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                 </div>
-                <span className="text-2xl font-bold">18</span>
+                <span className="text-2xl font-bold">{favoriteFiles}</span>
                 <span className="text-sm text-muted-foreground">Favorites</span>
               </div>
-              
+
               <div className="flex flex-col items-center p-4 bg-white/80 dark:bg-gray-900/80 rounded-lg border border-gray-100 dark:border-gray-800">
                 <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-full mb-2">
                   <BarChart2 className="h-6 w-6 text-green-600 dark:text-green-400" />
                 </div>
-                <span className="text-2xl font-bold">3.2GB</span>
+                <span className="text-2xl font-bold">{formatFileSize(fileTypeStorage(stats))}</span>
                 <span className="text-sm text-muted-foreground">Used Storage</span>
               </div>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="border-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-lg">
           <CardContent className="p-6">
             <Tabs defaultValue="files">
@@ -126,22 +147,17 @@ export default function Profile() {
                 <TabsTrigger value="activity">Activity</TabsTrigger>
                 <TabsTrigger value="stats">Storage Stats</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="files">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {recentFiles.map((file) => (
-                    <FileCard
-                      key={file.id}
-                      type={file.type as 'audio' | 'application' | 'image' | 'video'}
-                      title={file.title}
-                      thumbnail={file.thumbnail}
-                      isFavorite={file.isFavorite}
-                    />
-                  ))}
-                </div>
+                {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> */}
+                <LatestSection />
+                {/* </div> */}
               </TabsContent>
-              
+
               <TabsContent value="activity">
+                <p className='font-bold text-red-500'>
+                  This part is work in progress. So , the data your see here is just a placeholder.
+                </p>
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full">
@@ -153,7 +169,7 @@ export default function Profile() {
                       <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-full">
                       <Star className="h-4 w-4 text-purple-600 dark:text-purple-400" />
@@ -164,7 +180,7 @@ export default function Profile() {
                       <p className="text-xs text-muted-foreground mt-1">Yesterday</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-full">
                       <Upload className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -177,25 +193,27 @@ export default function Profile() {
                   </div>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="stats">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <h3 className="font-medium">Storage Usage</h3>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span>3.2 GB of 5 GB used</span>
-                        <span className="font-medium">64%</span>
+                        <span>{formatFileSize(fileTypeStorage(stats))} of 512 MB used</span>
+                        <span className="font-medium">{percetage} %</span>
                       </div>
                       <div className="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500 w-[64%] rounded-full"></div>
+                        {/* <div className={`h-full bg-blue-500 w-[${p}%] rounded-full`}></div> */}
+                        <Progress value={Math.round(+percetage)} className="h-2" />
+
                       </div>
                     </div>
                     <Button size="sm" variant="outline" className="mt-2">
                       Upgrade Storage
                     </Button>
                   </div>
-                  
+
                   <div className="space-y-3">
                     <h3 className="font-medium">Files by Type</h3>
                     <div className="space-y-2">
@@ -204,28 +222,28 @@ export default function Profile() {
                           <div className="w-3 h-3 rounded-full bg-blue-500"></div>
                           <span>Documents</span>
                         </div>
-                        <span>1.2 GB</span>
+                        <span>{formatFileSize(fileTypeStorage(stats, "application"))}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-purple-500"></div>
                           <span>Images</span>
                         </div>
-                        <span>0.8 GB</span>
+                        <span>{formatFileSize(fileTypeStorage(stats, "image"))}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-green-500"></div>
                           <span>Videos</span>
                         </div>
-                        <span>1.0 GB</span>
+                        <span>{formatFileSize(fileTypeStorage(stats, "video"))}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-orange-500"></div>
                           <span>Other</span>
                         </div>
-                        <span>0.2 GB</span>
+                        <span>0 GB</span>
                       </div>
                     </div>
                   </div>

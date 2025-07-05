@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Share2, Users, Clock, Eye, Edit, Shield } from 'lucide-react';
+import { Share2, Users, Clock, Eye, Edit, Shield, Loader } from 'lucide-react';
 import FolderCard from '@/components/dashboard/FolderCard';
 import FileCard from '@/components/dashboard/FileCard';
 import MediaViewer from '@/components/viewers/MediaViewer';
@@ -305,6 +305,8 @@ export default function Shared() {
     sort_order: "DESC",
   });
   console.log(files)
+
+  if (loading) return <Loader className='animate-spin' /> 
 
 
   return (

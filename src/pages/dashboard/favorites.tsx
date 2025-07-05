@@ -3,8 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader, Star } from 'lucide-react';
 import FileCard from '@/components/dashboard/FileCard';
 import { useFileDataStatus } from '@/hooks/useFileData';
+import MediaViewer from '@/components/viewers/MediaViewer';
+import { BASE_URL } from '@/components/common/BaseUrl';
+import axios from 'axios';
+import { useState } from 'react';
+import { useAuth } from '@/hooks/AuthProvider';
 
 export default function Favorites() {
+    const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+    const { token } = useAuth()
+      const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
+    
+  
   // const favoritesHardCoded = [
   //   {
   //     id: '1',
@@ -72,6 +82,40 @@ const getThumbnail = ( fileType:string) =>{
 
 }
 
+
+const handleFileClick = (file: any, index: number) => {
+
+    if (file.fileType === 'application' || file.fileType === 'document') {
+      openUrl(file.id)
+      return
+    }
+
+
+
+    if (file.fileType === 'image' || file.fileType === 'video' || file.fileType === 'audio') {
+      setCurrentMediaIndex(index);
+      setMediaViewerOpen(true);
+    }
+  };
+  const getFileUrlById = async (fileId: number): Promise<string> => {
+
+    const response = await axios.get(`${BASE_URL}/file/read/${fileId}`, {
+      headers: { "x-auth-token": `Bearer ${token}` },
+    });
+    const fileUrl = response.data?.data
+    return fileUrl;
+  };
+
+const openUrl = async (fileId: number) => {
+    // event.preventDefault(); // Stop default anchor behavior
+
+    try {
+      const url = await getFileUrlById(fileId);
+      window.open(url, '_blank'); // Open the signed URL in a new tab
+    } catch (err) {
+      console.error('Failed to fetch file URL:', err);
+    }
+  };
   return (
     <DashboardLayout title="Favorites">
       <div className="space-y-6">
@@ -91,7 +135,7 @@ const getThumbnail = ( fileType:string) =>{
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {favorites.map((file) => (
+              {favorites.map((file, index) => (
                 <FileCard
                 fileId={file.id}
                   key={file.id}
@@ -99,10 +143,22 @@ const getThumbnail = ( fileType:string) =>{
                   title={file.fileName}
                   thumbnail={file.thumbnailUrl ? file.thumbnailUrl : getThumbnail(file.fileType) }
                   isFavorite={file.isFavorite!}
+                onClick={() => handleFileClick(file, index)}
+
                 />
               ))}
             </div>
           </CardContent>
+          {
+                  mediaViewerOpen &&
+                  <MediaViewer
+                    open={mediaViewerOpen}
+                    onOpenChange={setMediaViewerOpen}
+                    files={favorites || []}
+                    currentIndex={currentMediaIndex}
+                    onIndexChange={setCurrentMediaIndex}
+                  />
+                }
         </Card>
 }
       </div>

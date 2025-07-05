@@ -96,6 +96,7 @@ export default function UploadModal({ open, onOpenChange, folderUuid }: UploadMo
     setIsUploading(true);
 
     try {
+      console.log(" files", files[0].size)
 
       const getUrl = await axios.post(`${BASE_URL}/file/upload`, {
         fileName: files[0].name,
