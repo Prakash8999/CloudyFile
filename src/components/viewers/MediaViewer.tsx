@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, ChevronLeft, ChevronRight, Play, Pause, Loader, Music } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Loader, Music } from 'lucide-react';
 import { FileAttributes } from '@/types/FileAttributes';
 import { useFileDataById } from '@/hooks/useFileData';
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 // interface MediaFile {
 //   id: string;
@@ -35,7 +34,7 @@ export default function MediaViewer({
   onIndexChange
 }: MediaViewerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentFileUrl, setCurrentFileUrl] = useState('');
+  // const [currentFileUrl, setCurrentFileUrl] = useState('');
   const currentFile = files[currentIndex];
   console.log("currentFile", currentFile);
 

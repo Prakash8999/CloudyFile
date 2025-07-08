@@ -3,13 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { UploadCloud, Image, Loader } from 'lucide-react';
 import FileCard from '@/components/dashboard/FileCard';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import UploadModal from '@/components/common/UploadModal';
-import axios from 'axios';
-import { BASE_URL } from '@/components/common/BaseUrl';
-import { useAuth } from '@/hooks/AuthProvider';
-import { FileAttributes } from '@/types/FileAttributes';
-import { toast, Toaster } from 'sonner';
+// import axios from 'axios';
+// import { BASE_URL } from '@/components/common/BaseUrl';
+// import { useAuth } from '@/hooks/AuthProvider';
+// import { FileAttributes } from '@/types/FileAttributes';
+import {  Toaster } from 'sonner';
 import { useFileData } from '@/hooks/useFileData';
 import MediaViewer from '@/components/viewers/MediaViewer';
 
@@ -112,7 +112,7 @@ const handlePhotoClick = (index: number) => {
                   fileId = { photo.id}
                   type="image"
                   title={photo.fileName}
-                  thumbnail={photo.thumbnailUrl ? photo.thumbnailUrl : "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/picture_12236741.png"}
+                  thumbnail={photo.thumbnailUrl ? photo.thumbnailUrl : "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/picture_12236741.png"}
                   isFavorite={photo.isFavorite ? photo.isFavorite : false}
                 onClick={() => handlePhotoClick(index)}
                 />

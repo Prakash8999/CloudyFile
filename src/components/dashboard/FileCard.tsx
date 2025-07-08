@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Heart, Share2, Trash2, ExternalLink, FileText, FileImage, Pause, AudioLinesIcon, Music2, Music2Icon, Music, Archive, ArchiveIcon } from 'lucide-react';
+import {  Heart, Share2, Trash2, FileText, Music,  ArchiveIcon } from 'lucide-react';
 import { useState } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../common/BaseUrl';
@@ -25,7 +25,7 @@ export default function FileCard({ fileId, type, title, thumbnail, isFavorite, o
   const [favorite, setFavorite] = useState(isFavorite);
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
-  const [isPlaying, setIsPlaying] = useState(false);
+  // const [isPlaying, setIsPlaying] = useState(false);
   const handleCardClick = () => {
     if (onClick) {
       onClick();
@@ -41,15 +41,15 @@ export default function FileCard({ fileId, type, title, thumbnail, isFavorite, o
 
 
   // console.log("new loading", newLoading);
-  const handleActionClick = (e: React.MouseEvent, action: () => void) => {
-    e.stopPropagation();
-    action();
-  };
+  // const handleActionClick = (e: React.MouseEvent, action: () => void) => {
+  //   e.stopPropagation();
+  //   action();
+  // };
   const handleFavoriteClick = async () => {
     setFavorite(!isFavorite);
 
     try {
-      const response = await axios.patch(`${BASE_URL}/file/change-status/${fileId}`, { "isFavorite": !isFavorite }, {
+       await axios.patch(`${BASE_URL}/file/change-status/${fileId}`, { "isFavorite": !isFavorite }, {
         headers: { "x-auth-token": `Bearer ${token}` },
       });
       setDataPost({

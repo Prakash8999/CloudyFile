@@ -7,9 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { useDeleteFile, useFileDataStatus } from '@/hooks/useFileData';
 import dayjs from 'dayjs';
 import { formatFileSize } from '@/lib/utils';
+import { useState } from 'react';
+import DeleteModel from '@/components/common/DeleteModel';
 
 
 export default function Recycle() {
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   // const deletedFiles = [
   //   {
   //     id: '1',
@@ -77,21 +81,30 @@ export default function Recycle() {
     }
   };
 
-    const { data:deletedFiles, loading } = useFileDataStatus("deleted");  // or "archived" or "deleted"
+  const { data: deletedFiles } = useFileDataStatus("deleted");  // or "archived" or "deleted"
   const expireIn = (date: string) => {
-  const expireAt = dayjs(date).add(1, 'month');
-  const today = dayjs();
+    const expireAt = dayjs(date).add(1, 'month');
+    const today = dayjs();
 
-  const remainingDays = expireAt.diff(today, 'day'); // difference in days
-  const expireFormat = expireAt.format('MMMM D, YYYY');
+    const remainingDays = expireAt.diff(today, 'day'); // difference in days
+    const expireFormat = expireAt.format('MMMM D, YYYY');
 
-  return {
-    expireAt: expireFormat,
-    daysLeft: remainingDays,
+    return {
+      expireAt: expireFormat,
+      daysLeft: remainingDays,
+    };
   };
-};
 
   const { updateStatus, loadingId } = useDeleteFile();
+
+  const [fileIds, setFileIds] = useState<number[]>()
+  const handleDelete = (ids: number[]) => {
+    setFileIds(ids)
+    setDeleteModalOpen(true)
+  }
+
+  // const handleDeleteAll = 
+  
 
 
   return (
@@ -109,7 +122,7 @@ export default function Recycle() {
                   Recently deleted files that can be restored
                 </CardDescription>
               </div>
-              <Button variant="outline">
+              <Button variant="outline" onClick={()=> handleDelete( deletedFiles.map((file )=> file.id))} >
                 Empty Recycle Bin
               </Button>
             </div>
@@ -131,7 +144,7 @@ export default function Recycle() {
                   <TableRow key={file.id}>
                     <TableCell className="font-medium">{file.fileName}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={getTypeColor(file.fileType ==='application' ? 'Document' : file.fileType)}>
+                      <Badge variant="outline" className={getTypeColor(file.fileType === 'application' ? 'Document' : file.fileType)}>
                         {file.fileType === 'application' ? 'Document' : file.fileType}
                       </Badge>
                     </TableCell>
@@ -144,7 +157,7 @@ export default function Recycle() {
                           <RefreshCw className={`mr-2 h-3 w-3 ${loadingId === file.id ? 'animate-spin' : ''}`} />
                           Restore
                         </Button>
-                        <Button size="sm" variant="outline" className="border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700">
+                        <Button size="sm" variant="outline" className="border-red-200 hover:bg-red-50 text-red-600 hover:text-red-700" onClick={() => handleDelete([file.id])}>
                           <X className="mr-2 h-3 w-3" />
                           Delete
                         </Button>
@@ -157,6 +170,8 @@ export default function Recycle() {
           </CardContent>
         </Card>
       </div>
+      <DeleteModel open={deleteModalOpen} onOpenChange={setDeleteModalOpen} fileIds={fileIds!} />
+
     </DashboardLayout>
   );
 }

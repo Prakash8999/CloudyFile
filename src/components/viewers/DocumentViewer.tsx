@@ -44,7 +44,7 @@ export default function DocumentViewer({
   const currentFile = files[currentIndex];
   // const totalPages = currentFile?.pages || 10; // Default to 10 pages for demo
   const totalPages = 10; // Default to 10 pages for demo
-  const { data: urlData, loading } = useFileDataById(currentFile.id, open)
+  const { data: urlData } = useFileDataById(currentFile.id, open)
   console.log("urlData ", urlData);
 
 

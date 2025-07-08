@@ -4,14 +4,11 @@ import { Button } from '@/components/ui/button';
 import { FolderIcon, Plus } from 'lucide-react';
 import FolderCard from './FolderCard';
 import CreateFolderModal from '@/components/common/CreateFolderModel';
-import axios from 'axios';
-import { BASE_URL } from '../common/BaseUrl';
 import { useFolderDataGeneric } from '@/hooks/useFolder';
 import { dateFormat } from '@/lib/utils';
 
 export default function FoldersSection() {
   const [createFolderModalOpen, setCreateFolderModalOpen] = useState(false);
-  const [loadingCreate, setLoadingCreate] = useState(false)
   // const [folders, setFolders] = useState([]);
 
   // const folders = [

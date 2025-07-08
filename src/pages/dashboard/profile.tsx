@@ -5,8 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Star, BarChart2, Mail, Github, Twitter, Linkedin, Upload } from 'lucide-react';
-import FileCard from '@/components/dashboard/FileCard';
+import { FileText, Star, BarChart2, Github, Twitter, Linkedin, Upload } from 'lucide-react';
 import { useFileStats } from '@/hooks/useFileData';
 import { fileTypeStorage, formatFileSize } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
@@ -18,27 +17,27 @@ import { useAuth } from '@/hooks/AuthProvider';
 
 
 export default function Profile() {
-  const recentFiles = [
-    {
-      id: '1',
-      type: 'document',
-      title: "Friday's Presentation",
-      isFavorite: false
-    },
-    {
-      id: '2',
-      type: 'image',
-      title: 'Barcelona',
-      thumbnail: 'https://images.pexels.com/photos/819764/pexels-photo-819764.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      isFavorite: true
-    },
-    {
-      id: '3',
-      type: 'document',
-      title: 'Project Proposal',
-      isFavorite: true
-    }
-  ];
+  // const recentFiles = [
+  //   {
+  //     id: '1',
+  //     type: 'document',
+  //     title: "Friday's Presentation",
+  //     isFavorite: false
+  //   },
+  //   {
+  //     id: '2',
+  //     type: 'image',
+  //     title: 'Barcelona',
+  //     thumbnail: 'https://images.pexels.com/photos/819764/pexels-photo-819764.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+  //     isFavorite: true
+  //   },
+  //   {
+  //     id: '3',
+  //     type: 'document',
+  //     title: 'Project Proposal',
+  //     isFavorite: true
+  //   }
+  // ];
   const { user } = useAuth()
 
   const [avatarUrl, setAvatarUrl] = useState('');
@@ -47,7 +46,7 @@ export default function Profile() {
 
   }, [user])
 
-  const { data: stats, loading } = useFileStats()
+  const { data: stats } = useFileStats()
 
   const favoriteFiles = stats.filter(file => file.isFavorite).length
   const totalSize = fileTypeStorage(stats)

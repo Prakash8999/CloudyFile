@@ -9,35 +9,35 @@ import { toast } from "sonner";
 
 
 
-  export const useFileData = (fileType: string) => {
-    const [data, setData] = useState<FileAttributes[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const { token, dataPost } = useAuth();
+export const useFileData = (fileType: string) => {
+  const [data, setData] = useState<FileAttributes[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { token, dataPost } = useAuth();
 
-    useEffect(() => {
-      const fetchFiles = async () => {
-        try {
-          setLoading(true);
-          const response = await axios.get(`${BASE_URL}/file/read?fileType=${fileType}&isArchived=${false}`, {
-            headers: { "x-auth-token": `Bearer ${token}` },
-          });
-          setData(response.data.data);
-        } catch (error: any) {
-          toast.error(error.response?.data?.message || "Failed to fetch file data");
-        } finally {
-          setLoading(false);
-        }
-      };
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${BASE_URL}/file/read?fileType=${fileType}&isArchived=${false}`, {
+          headers: { "x-auth-token": `Bearer ${token}` },
+        });
+        setData(response.data.data);
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to fetch file data");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      fetchFiles();
-    }, [fileType, token, dataPost.file]);
+    fetchFiles();
+  }, [fileType, token, dataPost.file]);
 
-    return { data, loading };
-  }
+  return { data, loading };
+}
 
 
 
-export const useFileDataById = (id: number, enabled = true, shared =false) => {
+export const useFileDataById = (id: number, enabled = true, shared = false) => {
 
   const [data, setData] = useState();
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,11 +49,11 @@ export const useFileDataById = (id: number, enabled = true, shared =false) => {
     const fetchFiles = async () => {
       try {
         setLoading(true);
-           const url = shared
+        const url = shared
           ? `${BASE_URL}/share-file/get-shared-files-url/${id}`
           : `${BASE_URL}/file/read/${id}`;
 
-      
+
 
 
         const response = await axios.get(url, {
@@ -78,7 +78,7 @@ export const useFileDataById = (id: number, enabled = true, shared =false) => {
 export const useFileDataStatus = (statusType: 'favorite' | 'archived' | 'deleted') => {
   const [data, setData] = useState<FileAttributes[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const { token, dataPost, setDataPost } = useAuth();
+  const { token, dataPost } = useAuth();
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -217,9 +217,9 @@ export const useFileDataLatest = (rawStart?: string, rawEnd?: string) => {
     };
 
     // fetchFiles();
-      fetchFiles();
-    
-    }, [token, dataPost.file, rawStart, rawEnd]);
+    fetchFiles();
+
+  }, [token, dataPost.file, rawStart, rawEnd]);
 
   return { data, loading };
 }
@@ -231,30 +231,65 @@ export const useFileDataLatest = (rawStart?: string, rawEnd?: string) => {
 
 
 
-  export const useFileStats = () => {
-    const [data, setData] = useState<FileAttributes[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const { token, dataPost } = useAuth();
+export const useFileStats = () => {
+  const [data, setData] = useState<FileAttributes[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { token, dataPost } = useAuth();
 
-    useEffect(() => {
-      const fetchFiles = async () => {
-        try {
-          setLoading(true);
-          const response = await axios.get(`${BASE_URL}/stats`, {
-            headers: { "x-auth-token": `Bearer ${token}` },
-          });
-          setData(response.data.data);
-          console.log(response .data.data);
-        } catch (error: any) {
-          toast.error(error.response?.data?.message || "Failed to fetch file data");
-        } finally {
-          setLoading(false);
-        }
-      };
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${BASE_URL}/stats`, {
+          headers: { "x-auth-token": `Bearer ${token}` },
+        });
+        setData(response.data.data);
+        console.log(response.data.data);
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to fetch file data");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      fetchFiles();
-    }, [ token, dataPost.file]);
+    fetchFiles();
+  }, [token, dataPost.file]);
 
-    return { data, loading };
-  }
+  return { data, loading };
+}
 
+
+
+export const usePermanentlyDeleteFile = () => {
+  const { token, dataPost, setDataPost } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  const deleteFile = async (fileIds: number[]) => {
+    try {
+      setIsLoading(true)
+      await axios.post(
+        `${BASE_URL}/file/delete-permanently`,
+        {
+          ids: fileIds
+        },
+
+        {
+
+          headers: { "x-auth-token": `Bearer ${token}` },
+
+        },
+
+      );
+      setDataPost({ file: dataPost.file + 1 });
+      setIsLoading(false)
+      toast.success("File deleted successfully");
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false)
+      toast.error("Error changing file status");
+    }
+  };
+
+  return { deleteFile, isLoading };
+};

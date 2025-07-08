@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { FileImage, FileVideo, FileText, Upload, X, Loader2 } from 'lucide-react';
+import { FileImage, FileVideo, FileText, Upload, X } from 'lucide-react';
 import axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 import { BASE_URL } from './BaseUrl';
 import { useAuth } from '@/hooks/AuthProvider';
@@ -131,6 +131,7 @@ export default function UploadModal({ open, onOpenChange, folderUuid }: UploadMo
         signal: newController.signal
 
       }
+      console.log(" getUrl.data?.data.uploadUrl ", getUrl.data?.data.uploadUrl)
       const uploadRes = await axios.put(getUrl.data?.data.uploadUrl, files[0], config);
       if (!uploadRes || uploadRes.statusText !== 'OK') {
         setIsUploading(false);

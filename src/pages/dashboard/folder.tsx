@@ -7,8 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
 	ArrowLeft,
 	UploadCloud,
-	Settings,
-	Share2,
 	MoreVertical,
 	UserPlus,
 	Folder as FolderIcon,
@@ -63,12 +61,12 @@ export default function FolderPage() {
 	}
 
 	// Separate media files (images and videos) and documents
-	const mediaFiles = folderData.files.filter(file => file.fileType === 'image' || file.fileType === 'video').map(file => ({
-		id: file.id,
-		fileType: file.fileType as 'image' | 'video',
-		fileName: file.fileName,
-		thumbnailUrl: file.thumbnailUrl
-	}));
+	// const mediaFiles = folderData.files.filter(file => file.fileType === 'image' || file.fileType === 'video').map(file => ({
+	// 	id: file.id,
+	// 	fileType: file.fileType as 'image' | 'video',
+	// 	fileName: file.fileName,
+	// 	thumbnailUrl: file.thumbnailUrl
+	// }));
 
 
 	const handleFileClick = (file: any, index: number) => {
@@ -102,10 +100,10 @@ export default function FolderPage() {
 
 	const getThumbnail = (fileType: string) => {
 		if (fileType === 'image') {
-			return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/picture_12236741.png"
+			return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/picture_12236741.png"
 		}
 		if (fileType === 'video') {
-			return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/5617bgr.jpg"
+			return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/5617bgr.jpg"
 		}
 
 	}

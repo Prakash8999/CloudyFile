@@ -16,13 +16,13 @@ export default function LatestSection() {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const { token } = useAuth()
 
-  const { data: files, loading } = useFileDataLatest(startDate, endDate)
+  const { data: files } = useFileDataLatest(startDate, endDate)
   const getThumbnail = (fileType: string) => {
     if (fileType === 'image') {
-      return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/picture_12236741.png"
+      return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/picture_12236741.png"
     }
     if (fileType === 'video') {
-      return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/5617bgr.jpg"
+      return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/5617bgr.jpg"
     }
 
   }

@@ -3,18 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { UploadCloud, FileText, Loader } from 'lucide-react';
 import FileCard from '@/components/dashboard/FileCard';
-import { MouseEvent, useState } from 'react';
+import { useState } from 'react';
 import UploadModal from '@/components/common/UploadModal';
-import { useFileData, useFileDataById } from '@/hooks/useFileData';
-import DocumentViewer from '@/components/viewers/DocumentViewer';
+import { useFileData } from '@/hooks/useFileData';
 import axios from 'axios';
 import { BASE_URL } from '@/components/common/BaseUrl';
 import { useAuth } from '@/hooks/AuthProvider';
 
 export default function Documents() {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
-  const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
+  // const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
+  // const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
 const [newLoading, setNewLoading] = useState(false)
   // const documents = [
   //   {
@@ -60,10 +59,10 @@ const [newLoading, setNewLoading] = useState(false)
   // ];
 
   const { data: documents, loading } = useFileData('application')
-  const handleDocumentClick = (index: number) => {
-    setCurrentDocumentIndex(index);
-    setDocumentViewerOpen(true);
-  };
+  // const handleDocumentClick = (index: number) => {
+  //   setCurrentDocumentIndex(index);
+  //   setDocumentViewerOpen(true);
+  // };
 
 const {token} = useAuth()
   const getFileUrlById = async (fileId: number): Promise<string> => {

@@ -74,10 +74,10 @@ export default function Favorites() {
   const { data:favorites, loading } = useFileDataStatus("favorite");  // or "archived" or "deleted"
 const getThumbnail = ( fileType:string) =>{
   if (fileType === 'image'){  
-    return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/picture_12236741.png"
+    return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/picture_12236741.png"
   }
   if (fileType === 'video'){
-    return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/5617bgr.jpg"
+    return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/5617bgr.jpg"
 } 
 
 }

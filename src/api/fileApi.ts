@@ -7,7 +7,7 @@ import { toast } from "sonner";
 export const handleDeleteClick = async (status:boolean, fileId:number) => {
 	try {
 		const {token, dataPost, setDataPost} = useAuth()
-      const response = await axios.patch(`${BASE_URL}/file/change-status/${fileId}`, { "isDeleted": status }, {
+      await axios.patch(`${BASE_URL}/file/change-status/${fileId}`, { "isDeleted": status }, {
         headers: { "x-auth-token": `Bearer ${token}` },
       });
       setDataPost({

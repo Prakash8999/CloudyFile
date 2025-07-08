@@ -59,7 +59,7 @@ export default function Archive() {
   //     status: 'Completed'
   //   }
   // ];
-    const { data:archives, loading } = useFileDataStatus("archived");  // or "archived" or "deleted"
+    const { data:archives } = useFileDataStatus("archived");  // or "archived" or "deleted"
     const { updateStatus } = useDeleteFile();
   
 

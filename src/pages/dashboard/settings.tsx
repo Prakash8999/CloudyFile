@@ -10,9 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Settings as SettingsIcon, Upload, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import AuthProvider, { useAuth } from '@/hooks/AuthProvider';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+// import { toast } from 'sonner';
+import { useAuth } from '@/hooks/AuthProvider';
+// import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme/theme-provider';
 
 export default function Settings() {

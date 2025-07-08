@@ -1,8 +1,7 @@
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Folder, FileImage, FileVideo, Music } from 'lucide-react';
-import { UUID } from 'crypto';
+import { Folder } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface FolderCardProps {

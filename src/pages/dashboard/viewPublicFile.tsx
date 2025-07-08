@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { BASE_URL } from '@/components/common/BaseUrl';
@@ -6,13 +6,13 @@ import { Music, FileText, Download, ExternalLink, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-enum fileType {
-	image = "image",
-	video = "video",
-	document = "document",
-	application = "application",
-	audio = "audio",
-}
+// enum fileType {
+// 	image = "image",
+// 	video = "video",
+// 	document = "document",
+// 	application = "application",
+// 	audio = "audio",
+// }
 
 export default function PublicView() {
 	const { fileId } = useParams<{ fileId: string }>();
@@ -25,7 +25,7 @@ export default function PublicView() {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [isPlaying, setIsPlaying] = useState(false);
 
-	const videoRef = useRef<HTMLVideoElement>(null);
+	// const videoRef = useRef<HTMLVideoElement>(null);
 
 	const [error, setError] = useState<string | null>(null);
 

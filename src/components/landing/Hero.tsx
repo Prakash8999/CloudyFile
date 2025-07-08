@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import { ArrowRight, Cloud, Shield, Zap } from 'lucide-react';
 import { useState } from 'react';
 import AuthModal from '../auth/AuthModal';

@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Share2, Users, Clock, Eye, Edit, Shield, Loader } from 'lucide-react';
-import FolderCard from '@/components/dashboard/FolderCard';
+// import FolderCard from '@/components/dashboard/FolderCard';
 import FileCard from '@/components/dashboard/FileCard';
 import MediaViewer from '@/components/viewers/MediaViewer';
-import DocumentViewer from '@/components/viewers/DocumentViewer';
+// import DocumentViewer from '@/components/viewers/DocumentViewer';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { BASE_URL } from '@/components/common/BaseUrl';
 import { useSharedFiles } from '@/hooks/useShareFileData';
@@ -18,11 +18,11 @@ import { useAuth } from '@/hooks/AuthProvider';
 import { Button } from '@/components/ui/button';
 
 export default function Shared() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
-  const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
+  // const [documentViewerOpen, setDocumentViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
+  // const [currentDocumentIndex, setCurrentDocumentIndex] = useState(0);
   const { token } = useAuth()
 
   // Mock shared folders data
@@ -90,118 +90,118 @@ export default function Shared() {
   ];
 
   // Mock shared files data
-  const sharedFiles = [
-    {
-      id: 'file-1',
-      type: 'document',
-      title: 'Q4 Financial Report',
-      sharedBy: {
-        id: '1',
-        name: 'Sarah Wilson',
-        avatar: 'https://github.com/shadcn.png',
-        email: 'sarah@company.com'
-      },
-      role: 'read',
-      sharedDate: '1 hour ago',
-      pages: 24,
-      url: '/documents/q4-report.pdf',
-      isFavorite: false
-    },
-    {
-      id: 'file-2',
-      type: 'image',
-      title: 'Product Mockup',
-      thumbnail: 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      url: 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      sharedBy: {
-        id: '2',
-        name: 'Mike Johnson',
-        avatar: 'https://github.com/shadcn.png',
-        email: 'mike@company.com'
-      },
-      role: 'write',
-      sharedDate: '3 hours ago',
-      isFavorite: true
-    },
-    {
-      id: 'file-3',
-      type: 'video',
-      title: 'Product Demo',
-      thumbnail: 'https://images.pexels.com/photos/5940721/pexels-photo-5940721.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      url: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-      sharedBy: {
-        id: '3',
-        name: 'Lisa Chen',
-        avatar: 'https://github.com/shadcn.png',
-        email: 'lisa@company.com'
-      },
-      role: 'read',
-      sharedDate: '1 day ago',
-      isFavorite: false
-    },
-    {
-      id: 'file-4',
-      type: 'document',
-      title: 'Project Proposal',
-      sharedBy: {
-        id: '4',
-        name: 'David Brown',
-        avatar: 'https://github.com/shadcn.png',
-        email: 'david@company.com'
-      },
-      role: 'write',
-      sharedDate: '2 days ago',
-      pages: 15,
-      url: '/documents/project-proposal.pdf',
-      isFavorite: false
-    },
-    {
-      id: 'file-5',
-      type: 'image',
-      title: 'Brand Guidelines',
-      thumbnail: 'https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      url: 'https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      sharedBy: {
-        id: '5',
-        name: 'Emma Davis',
-        avatar: 'https://github.com/shadcn.png',
-        email: 'emma@company.com'
-      },
-      role: 'read',
-      sharedDate: '3 days ago',
-      isFavorite: false
-    },
-    {
-      id: 'file-6',
-      type: 'audio',
-      title: 'Team Meeting Recording',
-      sharedBy: {
-        id: '6',
-        name: 'Alex Rodriguez',
-        avatar: 'https://github.com/shadcn.png',
-        email: 'alex@company.com'
-      },
-      role: 'write',
-      sharedDate: '1 week ago',
-      isFavorite: false
-    }
-  ];
+  // const sharedFiles = [
+  //   {
+  //     id: 'file-1',
+  //     type: 'document',
+  //     title: 'Q4 Financial Report',
+  //     sharedBy: {
+  //       id: '1',
+  //       name: 'Sarah Wilson',
+  //       avatar: 'https://github.com/shadcn.png',
+  //       email: 'sarah@company.com'
+  //     },
+  //     role: 'read',
+  //     sharedDate: '1 hour ago',
+  //     pages: 24,
+  //     url: '/documents/q4-report.pdf',
+  //     isFavorite: false
+  //   },
+  //   {
+  //     id: 'file-2',
+  //     type: 'image',
+  //     title: 'Product Mockup',
+  //     thumbnail: 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+  //     url: 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+  //     sharedBy: {
+  //       id: '2',
+  //       name: 'Mike Johnson',
+  //       avatar: 'https://github.com/shadcn.png',
+  //       email: 'mike@company.com'
+  //     },
+  //     role: 'write',
+  //     sharedDate: '3 hours ago',
+  //     isFavorite: true
+  //   },
+  //   {
+  //     id: 'file-3',
+  //     type: 'video',
+  //     title: 'Product Demo',
+  //     thumbnail: 'https://images.pexels.com/photos/5940721/pexels-photo-5940721.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+  //     url: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+  //     sharedBy: {
+  //       id: '3',
+  //       name: 'Lisa Chen',
+  //       avatar: 'https://github.com/shadcn.png',
+  //       email: 'lisa@company.com'
+  //     },
+  //     role: 'read',
+  //     sharedDate: '1 day ago',
+  //     isFavorite: false
+  //   },
+  //   {
+  //     id: 'file-4',
+  //     type: 'document',
+  //     title: 'Project Proposal',
+  //     sharedBy: {
+  //       id: '4',
+  //       name: 'David Brown',
+  //       avatar: 'https://github.com/shadcn.png',
+  //       email: 'david@company.com'
+  //     },
+  //     role: 'write',
+  //     sharedDate: '2 days ago',
+  //     pages: 15,
+  //     url: '/documents/project-proposal.pdf',
+  //     isFavorite: false
+  //   },
+  //   {
+  //     id: 'file-5',
+  //     type: 'image',
+  //     title: 'Brand Guidelines',
+  //     thumbnail: 'https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+  //     url: 'https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+  //     sharedBy: {
+  //       id: '5',
+  //       name: 'Emma Davis',
+  //       avatar: 'https://github.com/shadcn.png',
+  //       email: 'emma@company.com'
+  //     },
+  //     role: 'read',
+  //     sharedDate: '3 days ago',
+  //     isFavorite: false
+  //   },
+  //   {
+  //     id: 'file-6',
+  //     type: 'audio',
+  //     title: 'Team Meeting Recording',
+  //     sharedBy: {
+  //       id: '6',
+  //       name: 'Alex Rodriguez',
+  //       avatar: 'https://github.com/shadcn.png',
+  //       email: 'alex@company.com'
+  //     },
+  //     role: 'write',
+  //     sharedDate: '1 week ago',
+  //     isFavorite: false
+  //   }
+  // ];
 
   // Separate media files and documents for viewers
-  const mediaFiles = sharedFiles.filter(file => file.type === 'image' || file.type === 'video').map(file => ({
-    id: file.id,
-    type: file.type as 'image' | 'video',
-    title: file.title,
-    thumbnail: file.thumbnail,
-    url: file.url
-  }));
+  // const mediaFiles = sharedFiles.filter(file => file.type === 'image' || file.type === 'video').map(file => ({
+  //   id: file.id,
+  //   type: file.type as 'image' | 'video',
+  //   title: file.title,
+  //   thumbnail: file.thumbnail,
+  //   url: file.url
+  // }));
 
-  const documentFiles = sharedFiles.filter(file => file.type === 'document').map(file => ({
-    id: file.id,
-    title: file.title,
-    pages: file.pages || 10,
-    url: file.url || '/documents/default.pdf'
-  }));
+  // const documentFiles = sharedFiles.filter(file => file.type === 'document').map(file => ({
+  //   id: file.id,
+  //   title: file.title,
+  //   pages: file.pages || 10,
+  //   url: file.url || '/documents/default.pdf'
+  // }));
 
 
   const openUrl = async (fileId: number) => {
@@ -246,9 +246,9 @@ export default function Shared() {
 
 
 
-  const handleFolderClick = (folderId: string) => {
-    navigate(`/dashboard/folder/${folderId}`);
-  };
+  // const handleFolderClick = (folderId: string) => {
+  //   navigate(`/dashboard/folder/${folderId}`);
+  // };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -277,10 +277,10 @@ export default function Shared() {
   };
   const getThumbnail = (fileType: string) => {
     if (fileType === 'image') {
-      return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/picture_12236741.png"
+      return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/picture_12236741.png"
     }
     if (fileType === 'video') {
-      return "https://thumbnail-bucket-time.s3.eu-north-1.amazonaws.com/uploads/generic/5617bgr.jpg"
+      return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/5617bgr.jpg"
     }
 
   }
@@ -294,10 +294,8 @@ export default function Shared() {
     files,
     meta,
     loading,
-    error,
     setFilters,
-    filters,
-    refetch,
+    filters
   } = useSharedFiles({
     page: 1,
     limit: 10,

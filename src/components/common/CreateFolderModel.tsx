@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import {
 	Dialog,
 	DialogContent,
@@ -9,7 +9,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +28,6 @@ import {
 import { toast } from 'sonner';
 import { useFileDataGeneric } from '@/hooks/useFileData';
 import { formatFileSize } from '@/lib/utils';
-import { FileAttributes } from '@/types/FileAttributes';
 import axios from 'axios';
 import { BASE_URL } from './BaseUrl';
 import { useAuth } from '@/hooks/AuthProvider';

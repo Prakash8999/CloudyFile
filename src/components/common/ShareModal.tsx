@@ -15,7 +15,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
 import {
   UserPlus,
   X,
@@ -23,10 +22,8 @@ import {
   Link,
   Globe,
   Users,
-  Calendar,
   Eye,
   Edit,
-  Shield,
   Check
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -59,15 +56,14 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType, tok
   const [shareLink, setShareLink] = useState('');
   const [loading, setLoading] = useState(false);
   const [existingClbtrNumber, setExistingClbtrNumber] = useState(0);
-  const [expireDate, setExpireDate] = useState<string>();
   const [linkGenerated, setLinkGenerated] = useState(false);
-  const [linkSettings, setLinkSettings] = useState({
-    allowDownload: true,
-    requirePassword: false,
-    expiresIn: '7days',
-    allowComments: false
-  });
-  const [password, setPassword] = useState('');
+  // const [linkSettings, setLinkSettings] = useState({
+  //   allowDownload: true,
+  //   requirePassword: false,
+  //   expiresIn: '7days',
+  //   allowComments: false
+  // });
+  // const [password, setPassword] = useState('');
 
 
 
@@ -236,31 +232,31 @@ export default function ShareModal({ open, onOpenChange, fileName, fileType, tok
     }
   };
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'Reader':
-        return <Eye className="h-3 w-3" />;
-      case 'Editor':
-        return <Edit className="h-3 w-3" />;
-      // case 'admin':
-      //   return <Shield className="h-3 w-3" />;
-      default:
-        return <Eye className="h-3 w-3" />;
-    }
-  };
+  // const getRoleIcon = (role: string) => {
+  //   switch (role) {
+  //     case 'Reader':
+  //       return <Eye className="h-3 w-3" />;
+  //     case 'Editor':
+  //       return <Edit className="h-3 w-3" />;
+  //     // case 'admin':
+  //     //   return <Shield className="h-3 w-3" />;
+  //     default:
+  //       return <Eye className="h-3 w-3" />;
+  //   }
+  // };
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800';
-      case 'Editor':
-        return 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800';
-      case 'Reader':
-        return 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
-      default:
-        return 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
-    }
-  };
+  // const getRoleColor = (role: string) => {
+  //   switch (role) {
+  //     case 'admin':
+  //       return 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800';
+  //     case 'Editor':
+  //       return 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800';
+  //     case 'Reader':
+  //       return 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
+  //     default:
+  //       return 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700';
+  //   }
+  // };
 
   const shareFile = async () => {
 
