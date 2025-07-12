@@ -175,6 +175,7 @@ export default function UploadModal({ open, onOpenChange, folderUuid }: UploadMo
         toast.error(error.response?.data?.message);
         console.error("Upload error:", error.data);
       }
+      toast.error("Failed to add file");
       console.log(error)
     }
   };

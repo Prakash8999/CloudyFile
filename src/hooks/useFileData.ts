@@ -268,7 +268,7 @@ export const usePermanentlyDeleteFile = () => {
   const deleteFile = async (fileIds: number[]) => {
     try {
       setIsLoading(true)
-      await axios.post(
+    const deleteResponse =  await axios.post(
         `${BASE_URL}/file/delete-permanently`,
         {
           ids: fileIds
@@ -283,7 +283,8 @@ export const usePermanentlyDeleteFile = () => {
       );
       setDataPost({ file: dataPost.file + 1 });
       setIsLoading(false)
-      toast.success("File deleted successfully");
+      console.log(" File deleted", deleteResponse.data);
+      toast.success (deleteResponse.data.message || "File deleted successfully" );
     } catch (error) {
       console.error(error);
       setIsLoading(false)

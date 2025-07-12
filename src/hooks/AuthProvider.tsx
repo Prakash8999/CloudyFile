@@ -29,7 +29,7 @@ interface AuthContextType {
   token: string;
   setToken: (token: string) => void;
   dataPost: UploadState;
-  setDataPost: ( dataPost: UploadState) => void;
+  setDataPost: (dataPost: UploadState) => void;
   uploadEvents: UploadEvents;
   triggerUploadEvent: (type: keyof UploadEvents) => void; // ✅ this is correct now
 }
@@ -44,6 +44,7 @@ interface AuthProviderProps {
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string>(localStorage.getItem("token") || "");
   const [dataPost, setDataPost] = useState<UploadState>({
     file: 0,
@@ -51,26 +52,26 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [tokenError, setTokenError] = useState(false)
   const location = useLocation();
   const [uploadEvents, setUploadEvents] = useState<UploadEvents>({
-  file: 0,
-  folder: 0,
-  archive: 0,
-  shared: 0,
-});
+    file: 0,
+    folder: 0,
+    archive: 0,
+    shared: 0,
+  });
 
 
-const triggerUploadEvent = (type: keyof UploadEvents) => {
-  setUploadEvents(prev => ({
-    ...prev,
-    [type]: prev[type] + 1,
-  }));
-};
+  const triggerUploadEvent = (type: keyof UploadEvents) => {
+    setUploadEvents(prev => ({
+      ...prev,
+      [type]: prev[type] + 1,
+    }));
+  };
 
   const navigate = useNavigate()
   // const token = localStorage.getItem("token") || ""
   const currentPath = location.pathname;
 
   useEffect(() => {
-          const isPublicView = currentPath.startsWith("/view-file/");
+    const isPublicView = currentPath.startsWith("/view-file/");
 
     if (!token && !isPublicView) {
       if (currentPath !== '/') navigate('/');
@@ -81,21 +82,21 @@ const triggerUploadEvent = (type: keyof UploadEvents) => {
   }, [token, currentPath, navigate]);
 
 
-  
+
 
   const fetchUserData = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/user/read`, {
         headers: { "x-auth-token": `Bearer ${token}` }
       });
-  
+
       const data = response?.data;
       console.log(data);
       setUser(data?.data);
-  
-    } catch (error:any) {
+
+    } catch (error: any) {
       console.error("Error fetching user data:", error);
-  
+
       // Check for 401 Unauthorized or token-related issues
       if (error.response && error.response.status === 401) {
         // Token is likely invalid or expired
@@ -106,14 +107,21 @@ const triggerUploadEvent = (type: keyof UploadEvents) => {
       }
     }
   };
-  
+
+  // useEffect(() => {
+  //   if (token) {
+  //     fetchUserData();
+  //   }
+  // }, [token]);
   useEffect(() => {
     if (token) {
-      fetchUserData();
+      fetchUserData().finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
   }, [token]);
-  
-  
+
+
   // const regenToken = async () => {
   //   try {
   //      const oldtoken = localStorage.getItem("token") || ""
@@ -123,8 +131,8 @@ const triggerUploadEvent = (type: keyof UploadEvents) => {
   //       withCredentials:true,
   //       headers: { "x-auth-token": `Bearer ${oldtoken}`,
   //       },
-        
-        
+
+
   //     })
 
   //     console.log(newToken)
@@ -141,21 +149,21 @@ const triggerUploadEvent = (type: keyof UploadEvents) => {
 
 
   useEffect(() => {
-      const isPublicView = currentPath.startsWith("/view-file/");
-      console.log("is PublicView", isPublicView)
-    if (tokenError && !isPublicView && currentPath !== '/' ) {
-
+    const isPublicView = currentPath.startsWith("/view-file/");
+    console.log("is PublicView", isPublicView)
+    if (tokenError && !isPublicView && currentPath !== '/') {
+      setToken("")
       localStorage.removeItem('token')
       navigate('/')
       toast.error("Please relogin")
     }
   }, [tokenError, currentPath])
 
-  
+
 
   return (
-    <AuthContext.Provider value={{ token, user, setUser, setToken , dataPost, setDataPost, uploadEvents, triggerUploadEvent}}>
-      {children}
+    <AuthContext.Provider value={{ token, user, setUser, setToken, dataPost, setDataPost, uploadEvents, triggerUploadEvent }}>
+      {!loading && children}
     </AuthContext.Provider>
   )
 };
