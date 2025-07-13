@@ -9,31 +9,62 @@ import { toast } from "sonner";
 
 
 
-export const useFileData = (fileType: string) => {
+interface FileFilters {
+  page?: number;
+  limit?: number;
+  sort_by?: string;
+  sort_order?: "ASC" | "DESC";
+  [key: string]: any;
+}
+
+interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    total_count: number;
+    page: number;
+    total_pages: number;
+    limit: number;
+  };
+}
+
+export const useFileData = (fileType: string, initialFilters: FileFilters = {}) => {
   const [data, setData] = useState<FileAttributes[]>([]);
+  const [meta, setMeta] = useState<PaginatedResponse<FileAttributes>["meta"] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FileFilters>({
+    page: 1,
+    limit: 10,
+    sort_by: "id",
+    sort_order: "DESC",
+    ...initialFilters,
+  });
+
   const { token, dataPost } = useAuth();
 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/file/read?fileType=${fileType}&isArchived=${false}`, {
+        const response = await axios.get(`${BASE_URL}/file/read`, {
+          params: { fileType, isArchived: false, ...filters },
           headers: { "x-auth-token": `Bearer ${token}` },
         });
         setData(response.data.data);
+        setMeta(response.data.meta);
       } catch (error: any) {
         toast.error(error.response?.data?.message || "Failed to fetch file data");
+        setError(error.response?.data?.message || "Error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchFiles();
-  }, [fileType, token, dataPost.file]);
+  }, [fileType, token, dataPost.file, filters]);
 
-  return { data, loading };
-}
+  return { data, meta, loading, error, filters, setFilters };
+};
 
 
 
@@ -75,10 +106,20 @@ export const useFileDataById = (id: number, enabled = true, shared = false) => {
 }
 
 
-export const useFileDataStatus = (statusType: 'favorite' | 'archived' | 'deleted') => {
+export const useFileDataStatus = (statusType: 'favorite' | 'archived' | 'deleted', initialFilters: FileFilters = {}) => {
   const [data, setData] = useState<FileAttributes[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { token, dataPost } = useAuth();
+  const [meta, setMeta] = useState<PaginatedResponse<FileAttributes>["meta"] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FileFilters>({
+    page: 1,
+    limit: 10,
+    sort_by: "id",
+    sort_order: "DESC",
+    ...initialFilters,
+  });
+
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -97,6 +138,7 @@ export const useFileDataStatus = (statusType: 'favorite' | 'archived' | 'deleted
         }
 
         const response = await axios.get(`${BASE_URL}/file/read?${query}`, {
+          params  : {...filters},
           headers: { "x-auth-token": `Bearer ${token}` },
         });
         // setDataPost({
@@ -105,7 +147,11 @@ export const useFileDataStatus = (statusType: 'favorite' | 'archived' | 'deleted
 
 
         setData(response.data.data);
+        setMeta(response.data.meta);
+
       } catch (error: any) {
+        setError(error.response?.data?.message || "Error");
+
         toast.error(error.response?.data?.message || "Failed to fetch file data");
       } finally {
         setLoading(false);
@@ -113,9 +159,9 @@ export const useFileDataStatus = (statusType: 'favorite' | 'archived' | 'deleted
     };
 
     fetchFiles();
-  }, [statusType, token, dataPost.file]);
+  }, [statusType, token, dataPost.file, filters]);
 
-  return { data, loading };
+  return { data, loading, filters, setFilters, meta, error };
 };
 
 
@@ -268,7 +314,7 @@ export const usePermanentlyDeleteFile = () => {
   const deleteFile = async (fileIds: number[]) => {
     try {
       setIsLoading(true)
-    const deleteResponse =  await axios.post(
+      const deleteResponse = await axios.post(
         `${BASE_URL}/file/delete-permanently`,
         {
           ids: fileIds
@@ -284,7 +330,7 @@ export const usePermanentlyDeleteFile = () => {
       setDataPost({ file: dataPost.file + 1 });
       setIsLoading(false)
       console.log(" File deleted", deleteResponse.data);
-      toast.success (deleteResponse.data.message || "File deleted successfully" );
+      toast.success(deleteResponse.data.message || "File deleted successfully");
     } catch (error) {
       console.error(error);
       setIsLoading(false)

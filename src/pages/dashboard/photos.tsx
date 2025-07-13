@@ -69,7 +69,21 @@ export default function Photos() {
   //   }
   // ];
 
-  const { data: photos, loading } = useFileData('image')
+  // const { data: photos, loading } = useFileData('image')
+
+  const {
+  data: photos,
+  meta,
+  loading,
+  filters,
+  setFilters,
+} = useFileData("image", {
+  page: 1,
+  limit: 15,
+  sort_by: "createdAt",
+  sort_order: "DESC",
+});
+
   useEffect(() => {
     if (photos.length === 0) {
       setMediaViewerOpen(false);
@@ -134,6 +148,23 @@ export default function Photos() {
               </CardContent>
             </Card>
         }
+
+        <div className="flex gap-4 mt-4 justify-center">
+          <Button
+            disabled={filters.page === 1}
+            variant={'ghost'}
+            onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+          >
+            Previous
+          </Button>
+          <Button
+            variant={'ghost'}
+            disabled={meta! && filters.page === meta.total_pages || photos.length === 0}
+            onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+          >
+            Next
+          </Button>
+        </div>
       </div>
       <UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
       <Toaster richColors />

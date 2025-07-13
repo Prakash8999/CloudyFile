@@ -56,7 +56,21 @@ export default function Audios() {
   //   }
   // ];
 
-  const { data: audios, loading } = useFileData('audio')
+  // const { data: audios, loading } = useFileData('audio')
+
+  const {
+    data: audios,
+    meta,
+    loading,
+    filters,
+    setFilters,
+  } = useFileData("audio", {
+    page: 1,
+    limit: 15,
+    sort_by: "createdAt",
+    sort_order: "DESC",
+  });
+
 
   const handlePhotoClick = (index: number) => {
     setCurrentMediaIndex(index);
@@ -102,6 +116,26 @@ export default function Audios() {
                 </div>
               </CardContent>
             </Card>}
+
+
+        
+          <div className="flex gap-4 mt-4 justify-center">
+            <Button
+              disabled={filters.page === 1}
+              variant={'ghost'}
+              onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+            >
+              Previous
+            </Button>
+            <Button
+              variant={'ghost'}
+              disabled={meta! && filters.page === meta.total_pages || audios.length === 0}
+              onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+            >
+              Next
+            </Button>
+          </div>
+        
       </div>
       <UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
 

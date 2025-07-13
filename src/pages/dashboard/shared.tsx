@@ -298,7 +298,7 @@ export default function Shared() {
     filters
   } = useSharedFiles({
     page: 1,
-    limit: 10,
+    limit: 15,
     sort_by: "createdAt",
     sort_order: "DESC",
   });
@@ -432,7 +432,8 @@ export default function Shared() {
                   </Button>
                   <Button
                     variant={'ghost'}
-                    disabled={meta! && filters.page === meta.total_pages}
+                    disabled={meta! && filters.page === meta.total_pages  || files.length === 0}
+                     
                     onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
                   >
                     Next

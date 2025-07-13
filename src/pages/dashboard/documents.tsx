@@ -58,7 +58,20 @@ const [newLoading, setNewLoading] = useState(false)
   //   }
   // ];
 
-  const { data: documents, loading } = useFileData('application')
+  // const { data: documents, loading } = useFileData('application')
+    const {
+    data: documents,
+    meta,
+    loading,
+    filters,
+    setFilters,
+  } = useFileData("application", {
+    page: 1,
+    limit: 15,
+    sort_by: "createdAt",
+    sort_order: "DESC",
+  });
+
   // const handleDocumentClick = (index: number) => {
   //   setCurrentDocumentIndex(index);
   //   setDocumentViewerOpen(true);
@@ -127,6 +140,26 @@ const openUrl = async ( fileId: number) => {
                 </div>
               </CardContent>
             </Card>}
+            
+
+
+        <div className="flex gap-4 mt-4 justify-center">
+          <Button
+            disabled={filters.page === 1}
+            variant={'ghost'}
+            onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+          >
+            Previous
+          </Button>
+          <Button
+            variant={'ghost'}
+            disabled={meta! && filters.page === meta.total_pages || documents.length === 0}
+            onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+          >
+            Next
+          </Button>
+        </div>
+
       </div>
       <UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
       {/* {

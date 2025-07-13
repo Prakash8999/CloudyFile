@@ -52,7 +52,20 @@ export default function Videos() {
   //   },
   // ];
 
-  const { data: videos, loading } = useFileData('video')
+  // const { data: videos, loading } = useFileData('video')
+    const {
+      data: videos,
+      meta,
+      loading,
+      filters,
+      setFilters,
+    } = useFileData("video", {
+      page: 1,
+      limit: 15,
+      sort_by: "createdAt",
+      sort_order: "DESC",
+    });
+  
 
 
   const handleVideoClick = (index: number) => {
@@ -106,21 +119,41 @@ export default function Videos() {
               </CardContent>
             </Card>
         }
+
+        
+
+          <div className="flex gap-4 mt-4 justify-center">
+            <Button
+              disabled={filters.page === 1}
+              variant={'ghost'}
+              onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+            >
+              Previous
+            </Button>
+            <Button
+              variant={'ghost'}
+              disabled={meta! && filters.page === meta.total_pages || videos.length === 0}
+              onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+            >
+              Next
+            </Button>
+          </div>
+        
       </div>
       <UploadModal open={uploadModalOpen} onOpenChange={setUploadModalOpen} />
 
 
-{/* <div className='pb-8'>   */}
+      {/* <div className='pb-8'>   */}
 
 
       {
         mediaViewerOpen &&
         <MediaViewer
-        open={mediaViewerOpen}
-        onOpenChange={setMediaViewerOpen}
-        files={videos || []}
-        currentIndex={currentMediaIndex}
-        onIndexChange={setCurrentMediaIndex}
+          open={mediaViewerOpen}
+          onOpenChange={setMediaViewerOpen}
+          files={videos || []}
+          currentIndex={currentMediaIndex}
+          onIndexChange={setCurrentMediaIndex}
         />
       }
       {/* </div> */}

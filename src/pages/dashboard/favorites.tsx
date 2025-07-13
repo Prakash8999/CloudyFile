@@ -8,13 +8,14 @@ import { BASE_URL } from '@/components/common/BaseUrl';
 import axios from 'axios';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/AuthProvider';
+import { Button } from '@/components/ui/button';
 
 export default function Favorites() {
-    const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-    const { token } = useAuth()
-      const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
-    
-  
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const { token } = useAuth()
+  const [mediaViewerOpen, setMediaViewerOpen] = useState(false);
+
+
   // const favoritesHardCoded = [
   //   {
   //     id: '1',
@@ -71,19 +72,31 @@ export default function Favorites() {
   //   }
   // ];
 
-  const { data:favorites, loading } = useFileDataStatus("favorite");  // or "archived" or "deleted"
-const getThumbnail = ( fileType:string) =>{
-  if (fileType === 'image'){  
-    return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/picture_12236741.png"
+  // const { data: favorites, loading } = useFileDataStatus("favorite");  // or "archived" or "deleted"
+  const {
+    data: favorites,
+    meta,
+    loading,
+    filters,
+    setFilters,
+  } = useFileDataStatus("favorite", {
+    page: 1,
+    limit: 15,
+    sort_by: "createdAt",
+    sort_order: "DESC",
+  });
+  const getThumbnail = (fileType: string) => {
+    if (fileType === 'image') {
+      return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/picture_12236741.png"
+    }
+    if (fileType === 'video') {
+      return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/5617bgr.jpg"
+    }
+
   }
-  if (fileType === 'video'){
-    return "https://thumbnail-bucket-cloudyfile.s3.ap-south-1.amazonaws.com/uploads/generic/5617bgr.jpg"
-} 
-
-}
 
 
-const handleFileClick = (file: any, index: number) => {
+  const handleFileClick = (file: any, index: number) => {
 
     if (file.fileType === 'application' || file.fileType === 'document') {
       openUrl(file.id)
@@ -106,7 +119,7 @@ const handleFileClick = (file: any, index: number) => {
     return fileUrl;
   };
 
-const openUrl = async (fileId: number) => {
+  const openUrl = async (fileId: number) => {
     // event.preventDefault(); // Stop default anchor behavior
 
     try {
@@ -120,47 +133,64 @@ const openUrl = async (fileId: number) => {
     <DashboardLayout title="Favorites">
       <div className="space-y-6">
         {
-                  loading  ? <Loader className='animate-spin' /> :
+          loading ? <Loader className='animate-spin' /> :
 
-        
-        <Card className="border-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-              Favorite Files
-            </CardTitle>
-            <CardDescription>
-              Quick access to your most important files
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {favorites.map((file, index) => (
-                <FileCard
-                fileId={file.id}
-                  key={file.id}
-                  type={file.fileType as 'audio' | 'application' | 'image' | 'video'}
-                  title={file.fileName}
-                  thumbnail={file.thumbnailUrl ? file.thumbnailUrl : getThumbnail(file.fileType) }
-                  isFavorite={file.isFavorite!}
-                onClick={() => handleFileClick(file, index)}
 
+            <Card className="border-0 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                  Favorite Files
+                </CardTitle>
+                <CardDescription>
+                  Quick access to your most important files
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {favorites.map((file, index) => (
+                    <FileCard
+                      fileId={file.id}
+                      key={file.id}
+                      type={file.fileType as 'audio' | 'application' | 'image' | 'video'}
+                      title={file.fileName}
+                      thumbnail={file.thumbnailUrl ? file.thumbnailUrl : getThumbnail(file.fileType)}
+                      isFavorite={file.isFavorite!}
+                      onClick={() => handleFileClick(file, index)}
+
+                    />
+                  ))}
+                </div>
+              </CardContent>
+              {
+                mediaViewerOpen &&
+                <MediaViewer
+                  open={mediaViewerOpen}
+                  onOpenChange={setMediaViewerOpen}
+                  files={favorites || []}
+                  currentIndex={currentMediaIndex}
+                  onIndexChange={setCurrentMediaIndex}
                 />
-              ))}
-            </div>
-          </CardContent>
-          {
-                  mediaViewerOpen &&
-                  <MediaViewer
-                    open={mediaViewerOpen}
-                    onOpenChange={setMediaViewerOpen}
-                    files={favorites || []}
-                    currentIndex={currentMediaIndex}
-                    onIndexChange={setCurrentMediaIndex}
-                  />
-                }
-        </Card>
-}
+              }
+            </Card>
+        }
+
+        <div className="flex gap-4 mt-4 justify-center">
+          <Button
+            disabled={filters.page === 1}
+            variant={'ghost'}
+            onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+          >
+            Previous
+          </Button>
+          <Button
+            variant={'ghost'}
+            disabled={meta! && filters.page === meta.total_pages || favorites.length === 0}
+            onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </DashboardLayout>
   );
