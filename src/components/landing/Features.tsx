@@ -1,25 +1,26 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Lock, Brain, Zap, Share2, BarChart2, Smartphone } from 'lucide-react';
+import { Lock, Brain, Zap, BarChart2, Smartphone, Clock } from 'lucide-react';
 
 export default function Features() {
   const features = [
     {
       title: 'Secure Storage',
-      description: 'AES-256 encryption and automatic backups keep your files safe and protected.',
+      description: 'End-to-end encryption keeps your files safe and protected.',
       icon: Lock,
       color: 'from-blue-400 to-blue-600'
     },
     {
       title: 'Smart Organization',
-      description: 'AI-powered file categorization and tagging that saves you time and keeps everything organized.',
+      description: 'AI-powered file categorization and tagging that saves you time and keeps everything organized. Coming soon in an upcoming update!',
       icon: Brain,
       color: 'from-purple-400 to-purple-600'
-    },
+    }
+    ,
     {
-      title: 'Fast Sharing',
-      description: 'Share files with anyone in seconds with customizable permissions and expiration dates.',
-      icon: Share2,
-      color: 'from-green-400 to-green-600'
+      title: 'Recent Files',
+      description: 'Quickly access your recently opened or uploaded files from the dashboard.',
+      icon: Clock,
+      color: 'from-yellow-400 to-yellow-600'
     },
     {
       title: 'Access Anywhere',
@@ -53,7 +54,7 @@ export default function Features() {
             Cloudyfile combines powerful technology with intuitive design to make file management effortless.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <Card key={index} className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all duration-200 hover:shadow-md hover:bg-white/90 dark:hover:bg-gray-900/90">

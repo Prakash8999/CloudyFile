@@ -3,7 +3,7 @@ import Hero from '@/components/landing/Hero';
 import Features from '@/components/landing/Features';
 import Showcase from '@/components/landing/Showcase';
 import TrustSection from '@/components/landing/TrustSection';
-import PricingCTA from '@/components/landing/PricingCTA';
+// import PricingCTA from '@/components/landing/PricingCTA';
 
 export default function Landing() {
   return (
@@ -12,7 +12,7 @@ export default function Landing() {
       <Features />
       <Showcase />
       <TrustSection />
-      <PricingCTA />
+      {/* <PricingCTA /> */}
     </LandingLayout>
   );
 }
