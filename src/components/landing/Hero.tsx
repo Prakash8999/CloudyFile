@@ -26,10 +26,10 @@ export default function Hero() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-800 px-3 py-1 text-sm text-blue-600 dark:text-blue-300 mb-6">
-              <span className="font-medium">New</span>
-              <span className="ml-2 text-blue-500 dark:text-blue-400">Enhanced encryption & AI file organization</span>
-            </div>
+            {/* <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 dark:bg-blue-900/30 dark:border-blue-800 px-3 py-1 text-sm text-blue-600 dark:text-blue-300 mb-6">
+              <span className="font-medium">Upcoming</span>
+              <span className="ml-2 text-blue-500 dark:text-blue-400">AI file organization</span>
+            </div> */}
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
               All Your Files.
