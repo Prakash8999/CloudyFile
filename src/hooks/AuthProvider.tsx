@@ -83,7 +83,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 
 
-
   const fetchUserData = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/user/read`, {
@@ -91,17 +90,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       });
 
       const data = response?.data;
-      console.log(data);
       setUser(data?.data);
-
     } catch (error: any) {
       console.error("Error fetching user data:", error);
 
-      // Check for 401 Unauthorized or token-related issues
       if (error.response && error.response.status === 401) {
-        // Token is likely invalid or expired
-        toast.error("Session expired. Please log in again.");
-        setTokenError(true); // Optional: use this to redirect or handle globally
+        // only show this if user manually refreshed or tried login
+        if (user) {
+          toast.error("Session expired. Please log in again.");
+        }
+        setTokenError(true);  // but don't immediately wipe token
       } else {
         toast.error("Failed to fetch user data.");
       }
@@ -150,16 +148,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const isPublicView = currentPath.startsWith("/view-file/");
-    console.log("is PublicView", isPublicView)
-    if (tokenError && !isPublicView && currentPath !== '/') {
-      setToken("")
-      localStorage.removeItem('token')
-      navigate('/')
-      toast.error("Please relogin")
+    if (tokenError && !isPublicView && currentPath !== '/' && !user) {
+      setToken("");
+      localStorage.removeItem('token');
+      navigate('/');
+      toast.error("Please relogin");
     }
-  }, [tokenError, currentPath])
-
-
+  }, [tokenError, currentPath, user]);
 
   return (
     <AuthContext.Provider value={{ token, user, setUser, setToken, dataPost, setDataPost, uploadEvents, triggerUploadEvent }}>
