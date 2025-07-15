@@ -18,7 +18,7 @@ CloudyFile is a full-stack file management system built to handle secure uploads
 
 📤 Shared files with role-based access (viewer, editor)
 
-🔎 Filter with pagination
+🔎 Search & filter with pagination
 
 🛠️ Built with scalable microservice-friendly architecture
 
@@ -37,9 +37,8 @@ npm install
 npm run dev
 
 
-![Image 1](https://ibb.co/dw1nyKsG)
-![Image 2](https://drive.google.com/file/d/16ODJGYpB4gVdN1zUUk2rwIml8Z5lL-tN/view?usp=sharing)
-![Image 3](https://drive.google.com/file/d/1lfUnheppoggJ9tZjkG4Sq_s7TiTTWa3o/view?usp=sharing)
-![Image 4](https://drive.google.com/file/d/1zQbJaf2uvnh6l7pteLvCZmo4KNzsEBJ5/view?usp=sharing)
-![Image 5](https://drive.google.com/file/d/1cu5xVUNPKo3FG44tbBGKzaks9--fzftA/view?usp=sharing)
-
+![alt text](/readme_assets/image1.png)
+![alt text](/readme_assets/image2.png)
+![alt text](/readme_assets/image3.png)
+![alt text](/readme_assets/image4.png)
+![alt text](/readme_assets/image5.png)
